@@ -237,4 +237,637 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
           <option value="5000">Cược 5.000 XP</option>
         </select>
         <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="btn danger" style
+          <button class="btn danger" style="margin:0" onclick="createPvpRoom()">TẠO PHÒNG</button>
+          <input id="pvp-join-code" type="text" placeholder="MÃ PHÒNG" maxlength="6" style="margin:0;text-transform:uppercase;text-align:center;font-weight:bold">
+          <button class="btn success" style="margin:0;width:95px" onclick="joinPvpRoom()">VÀO ĐẤU</button>
+        </div>
+      </div>
+
+      <button class="btn success" id="btn-voucher" style="display:none" onclick="openVoucher()">🎉 XUẤT PHIẾU NHẬN 10.000 VNĐ</button>
+      <button class="btn" style="border-color:var(--success);color:var(--success);display:none" id="btn-admin" onclick="openAdmin()">TRUY CẬP ADMIN PANEL</button>
+    </div>
+    <button class="btn danger" onclick="logoutAction()" style="margin-bottom:6px">ĐĂNG XUẤT</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div>
+      <div class="top-bar">
+        <div class="brand" id="quiz-title">CHIẾN TRƯỜNG</div>
+        <div class="user-badge" id="quiz-points">0 XP</div>
+      </div>
+      <div class="card">
+        <div class="q-meta">
+          <span id="q-progress">CÂU 1/50</span>
+          <span id="q-reward">THƯỞNG: +500 XP</span>
+        </div>
+        <div id="quiz-question" class="terminal-box"></div>
+      </div>
+      <label>1. ĐÁP ÁN CHÍNH XÁC (TỰ ĐIỀN)</label>
+      <textarea id="quiz-ans" placeholder="Nhập đáp án..." onpaste="return false" ondrop="return false"></textarea>
+      <label>2. GIẢI THÍCH LOGIC VÌ SAO (BẮT BUỘC)</label>
+      <textarea id="quiz-exp" placeholder="Giải thích rõ logic..." onpaste="return false" ondrop="return false"></textarea>
+      <button class="btn success" onclick="submitQuiz()">NỘP BÀI & CHẤM LOGIC</button>
+    </div>
+    <button class="btn danger" onclick="exitRoomWithPenalty()" style="margin-bottom:6px">THOÁT PHÒNG (RESET 50 CÂU)</button>
+  </div>
+
+  <!-- PVP WAIT -->
+  <div id="screen-pvp-wait" class="screen">
+    <div>
+      <div class="top-bar"><div class="brand" style="color:var(--danger)">1v1 ARENA // CHỜ ĐỐI THỦ</div></div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:11px;color:var(--text-dim)">MÃ PHÒNG CỦA BẠN</div>
+        <div class="room-code-display" id="pvp-display-code">------</div>
+        <p style="font-size:12px;color:var(--text);margin-top:8px">Gửi mã này cho đối thủ.<br>Trận đấu tự động bắt đầu khi có người vào nhận kèo!</p>
+      </div>
+    </div>
+    <button class="btn danger" onclick="cancelPvpRoom()" style="margin-bottom:6px">HỦY PHÒNG & HOÀN ĐIỂM</button>
+  </div>
+
+  <!-- PVP PLAY -->
+  <div id="screen-pvp-play" class="screen">
+    <div>
+      <div class="top-bar">
+        <div class="brand" style="color:var(--danger)">⚔️ 1v1 ĐẤU TRƯỜNG KHÔ MÁU</div>
+        <div class="user-badge" id="pvp-play-badge">CƯỢC</div>
+      </div>
+      <div class="timer-display" id="pvp-timer">45</div>
+      <div class="card">
+        <div id="pvp-q-box" class="terminal-box"></div>
+      </div>
+      <label>ĐÁP ÁN 1v1</label>
+      <textarea id="pvp-ans" placeholder="Gõ đáp án..." onpaste="return false"></textarea>
+      <label>GIẢI THÍCH LOGIC</label>
+      <textarea id="pvp-exp" placeholder="Giải thích chi tiết..." onpaste="return false"></textarea>
+      <button class="btn danger" onclick="submitPvpAnswer()">NỘP BÀI THẮNG THUA</button>
+    </div>
+    <button class="btn danger" style="margin-bottom:6px;opacity:0.3;pointer-events:none">ĐANG CHIẾN...</button>
+  </div>
+
+  <!-- VOUCHER -->
+  <div id="screen-voucher" class="screen" style="justify-content:center">
+    <div class="card" style="text-align:center;border-color:var(--accent)">
+      <h2 style="color:var(--accent);letter-spacing:2px;margin-bottom:6px">SÉC QUÀ TẶNG 19/11</h2>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">BAN TỔ CHỨC NAM SINH LỚP HỌC</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0" id="v-name"></div>
+      <div style="font-size:32px;font-weight:800;color:var(--success);margin:8px 0;">10.000 VNĐ</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:12px">Chụp màn hình đưa cho Ban Tổ Chức nhận tiền thưởng mặt.</div>
+      <div style="font-size:11px;color:var(--accent);margin-top:6px" id="v-id"></div>
+    </div>
+    <button class="btn" onclick="goHome()">QUAY LẠI MENU</button>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="screen-admin" class="screen">
+    <div>
+      <div class="top-bar">
+        <div class="brand" style="color:var(--danger)">ADMIN OVERLORD</div>
+        <div class="user-badge" style="border-color:var(--danger);color:var(--danger)">QUYỀN TỐI CAO</div>
+      </div>
+      <div class="card" style="border-color:var(--danger)">
+        <h3 style="color:var(--danger);font-size:13px;margin-bottom:6px">QUẢN LÝ THÀNH VIÊN TRỰC TUYẾN</h3>
+        <div style="max-height:200px;overflow-y:auto">
+          <table class="leaderboard-table">
+            <thead><tr><th>Họ Tên</th><th>Điểm / Lỗi</th><th>Thao Tác</th></tr></thead>
+            <tbody id="admin-user-list"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <label>TẠO MÃ CODE QUÀ TẶNG 5K MỚI</label>
+        <div style="display:flex;gap:8px">
+          <input id="admin-new-code" type="text" placeholder="VD: VIP2026" style="margin:0;text-transform:uppercase">
+          <button class="btn" style="margin:0;width:95px;min-height:42px" onclick="adminCreateCode()">TẠO MÃ</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn" onclick="goHome()" style="margin-bottom:6px">THOÁT ADMIN PANEL</button>
+  </div>
+
+  <!-- OVERLAYS -->
+  <div id="alert-box" class="alert-overlay">
+    <h2 style="color:var(--danger);margin-bottom:8px">🚨 PHÁT HIỆN GIAN LẬN</h2>
+    <p id="alert-msg" style="font-size:14px;margin-bottom:10px;color:var(--text)"></p>
+    <p style="font-size:12px;color:var(--accent)">• Trừ thẳng 2.000 XP<br>• Hủy toàn bộ 50 câu cũ & tạo mới 50 câu khác!</p>
+  </div>
+
+  <div id="banned-box" class="banned-overlay">
+    <h1 style="font-size:32px;margin-bottom:8px;">BỊ KHÓA TRUY CẬP</h1>
+    <p style="font-size:13px;line-height:1.5">Tài khoản đã bị khóa vĩnh viễn do vi phạm Anti-Cheat 3 lần<br>hoặc thoát ngang khi đang đấu 1v1.</p>
+  </div>
+
+  <div id="popup-notify" class="popup-notify"></div>
+</div>
+
+<script>
+// Khởi tạo kết nối Firebase Realtime an toàn
+const firebaseConfig = {
+  databaseURL: "https://overlord-1911-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+let state = {
+  name: '', classId: '', points: 0,
+  isBanned: false, cheatCount: 0,
+  currentRoom: 0,
+  pool1: [], pool2: [],
+  idx1: 0, idx2: 0,
+  redeemedCodes: [],
+  hasFiredFireworks: false,
+  pvp: null
+};
+
+// Lắng nghe dữ liệu người dùng realtime toàn cục
+db.ref('users').on('value', (snapshot) => {
+  const users = snapshot.val() || {};
+  renderLeaderboard(users);
+  renderAdminTable(users);
+  
+  if(state.name) {
+    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    if(users[safeKey]) {
+      let u = users[safeKey];
+      state.points = u.points || 0;
+      state.isBanned = u.isBanned || false;
+      state.cheatCount = u.cheatCount || 0;
+      state.redeemedCodes = u.redeemedCodes || [];
+      state.hasFiredFireworks = u.hasFiredFireworks || false;
+      
+      if(state.isBanned) {
+        document.getElementById('banned-box').classList.add('show');
+      }
+      updateHomeUI();
+    }
+  }
+});
+
+function syncUserData() {
+  if(!state.name) return;
+  const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+  db.ref('users/' + safeKey).set({
+    name: state.name,
+    classId: state.classId,
+    points: state.points,
+    isBanned: state.isBanned,
+    cheatCount: state.cheatCount,
+    redeemedCodes: state.redeemedCodes,
+    hasFiredFireworks: state.hasFiredFireworks
+  });
+}
+
+// BỘ SINH 50 CÂU HỎI
+function generate50HackerQuestions(seed) {
+  const generators = [
+    (i) => {
+      let a = (i * 3 + seed) % 15 + 4;
+      let b = (i * 7 + seed) % 9 + 2;
+      let res = a * b + a;
+      return { q: `[C++ Logic #${i}]\nint a = ${a}, b = ${b};\nint x = a * b + _____;\ncout << x; // In ra ${res}`, ans: [String(a), 'a'], explain: ['cong', 'bien a', String(a)], pts: 450 };
+    },
+    (i) => {
+      let limit = 5 + ((i + seed) % 12);
+      return { q: `[Vòng lặp bẫy #${i}]\nint dem = 0;\nfor(int i = 1; i <= ${limit}; i++) {\n  if(i % 2 == 0) _____;\n}\n// Đếm số chẵn từ 1 đến ${limit}`, ans: ['dem++', 'dem += 1', '++dem'], explain: ['tang', 'bien dem', 'chia het'], pts: 500 };
+    },
+    (i) => {
+      let len = 6 + (i % 5);
+      let idx = (i + seed) % len;
+      return { q: `[Mảng C++ #${i}]\nMảng có ${len} phần tử từ 0.\nLấy phần tử thứ ${idx + 1} từ trái sang:\narr[_____]`, ans: [String(idx)], explain: ['bat dau tu 0', 'chi so', 'index'], pts: 450 };
+    }
+  ];
+  let list = [];
+  for(let i = 1; i <= 50; i++) list.push(generators[i % generators.length](i));
+  return list.sort(() => Math.random() - 0.5);
+}
+
+function generate50RiddleQuestions(seed) {
+  const staticHard = [
+    { q: "Người đàn ông đẩy xe tới khách sạn và biết mình phá sản?", ans: ["co ty phu", "choi co"], explain: ["ban co", "tro choi"], pts: 550 },
+    { q: "Có 3 bóng đèn kín và 3 công tắc ngoài cửa. Vào phòng 1 lần duy nhất để biết đèn nào?", ans: ["bat 1 cai lau", "so bong nong"], explain: ["nong", "am", "sang"], pts: 650 },
+    { q: "Chọn phòng tử hình: 1 Lửa cháy, 2 Sát thủ cầm súng, 3 Sư tử đói 3 năm?", ans: ["phong 3", "so 3", "ba"], explain: ["chet", "bo doi 3 nam"], pts: 500 }
+  ];
+  let list = [...staticHard];
+  while(list.length < 50) {
+    list.push({ q: `[Bẫy Toán Học #${list.length}] Tuổi cha gấp 4 lần tuổi con. 20 năm sau cha gấp đôi. Tổng tuổi hai cha con hiện nay?`, ans: ["50"], explain: ["phuong trinh", "tuoi cha", "tuoi con"], pts: 550 });
+  }
+  return list.sort(() => Math.random() - 0.5);
+}
+
+class FireworkSystem {
+  constructor() {
+    this.canvas = document.getElementById('fireworks-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.particles = [];
+    this.animId = null;
+  }
+  start() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.canvas.classList.add('show');
+    let count = 0;
+    const interval = setInterval(() => { this.spawn(); count++; if(count > 12) clearInterval(interval); }, 300);
+    if(!this.animId) this.loop();
+    setTimeout(() => this.stop(), 5000);
+  }
+  spawn() {
+    const x = Math.random() * this.canvas.width;
+    const y = Math.random() * (this.canvas.height * 0.5);
+    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    for(let i=0; i<50; i++) {
+      let angle = Math.random() * Math.PI * 2, speed = Math.random() * 6 + 2;
+      this.particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, alpha: 1, decay: Math.random() * 0.015 + 0.01, color });
+    }
+  }
+  loop() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.particles.forEach((p, index) => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= p.decay;
+      this.ctx.save(); this.ctx.globalAlpha = Math.max(0, p.alpha); this.ctx.fillStyle = p.color;
+      this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 3, 0, Math.PI*2); this.ctx.fill(); this.ctx.restore();
+      if(p.alpha <= 0) this.particles.splice(index, 1);
+    });
+    if(this.particles.length > 0) this.animId = requestAnimationFrame(() => this.loop());
+    else { this.animId = null; this.canvas.classList.remove('show'); }
+  }
+  stop() { this.particles = []; this.canvas.classList.remove('show'); if(this.animId) cancelAnimationFrame(this.animId); this.animId = null; }
+}
+const fw = new FireworkSystem();
+
+function normalizeStr(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
+}
+
+function initWatermark(name, cls) {
+  let html = '';
+  for(let i=0; i<16; i++) html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}] 19/11</span>`;
+  document.getElementById('watermark-layer').innerHTML = html;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function popup(txt) {
+  const el = document.getElementById('popup-notify');
+  el.textContent = txt;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function loginAction() {
+  let name = document.getElementById('in-name').value.trim();
+  let cls = document.getElementById('in-class').value.trim();
+  if(!name || !cls) return alert('Vui lòng nhập đầy đủ họ tên và lớp!');
+  
+  if(name.toUpperCase() === 'ADMIN' || name.toUpperCase() === 'T.N.TUAN ANH') {
+    name = 'ADMIN'; cls = 'OVERLORD';
+  }
+
+  state.name = name;
+  state.classId = cls;
+
+  let seed = Math.floor(Math.random() * 9999);
+  state.pool1 = generate50HackerQuestions(seed);
+  state.pool2 = generate50RiddleQuestions(seed);
+  state.idx1 = 0; state.idx2 = 0;
+
+  const safeKey = name.replace(/[.#$\/\[\]]/g, '_');
+  db.ref('users/' + safeKey).once('value').then((snap) => {
+    if(!snap.exists()) {
+      db.ref('users/' + safeKey).set({ name, classId: cls, points: 0, isBanned: false, cheatCount: 0, redeemedCodes: [], hasFiredFireworks: false });
+    }
+  });
+
+  initWatermark(name, cls);
+  updateHomeUI();
+  showScreen('screen-home');
+}
+
+function logoutAction() {
+  state.name = ''; state.currentRoom = 0;
+  showScreen('screen-login');
+}
+
+function updateHomeUI() {
+  if(!state.name) return;
+  document.getElementById('lbl-username').textContent = state.name + ' // ' + state.classId;
+  document.getElementById('lbl-points').textContent = state.points.toLocaleString() + ' XP';
+  document.getElementById('quiz-points').textContent = state.points.toLocaleString() + ' XP';
+  document.getElementById('progress-bar').style.width = Math.min(100, (state.points / 10000) * 100) + '%';
+  
+  if(state.points >= 10000 && !state.hasFiredFireworks) {
+    state.hasFiredFireworks = true;
+    syncUserData();
+    fw.start();
+  }
+  document.getElementById('btn-voucher').style.display = (state.points >= 10000) ? 'block' : 'none';
+  
+  // Hiển thị nút Admin ngay lập tức nếu là ADMIN
+  if(state.name.toUpperCase() === 'ADMIN') {
+    document.getElementById('btn-admin').style.display = 'block';
+  } else {
+    document.getElementById('btn-admin').style.display = 'none';
+  }
+}
+
+function renderLeaderboard(users) {
+  let userArr = Object.values(users).map(u => ({ name: u.name, points: u.points || 0, banned: u.isBanned }));
+  userArr.sort((a, b) => b.points - a.points);
+
+  let lbox = document.getElementById('leaderboard-list');
+  lbox.innerHTML = '';
+  if(userArr.length === 0) {
+    lbox.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Chưa có dữ liệu</td></tr>`;
+    return;
+  }
+  userArr.forEach((u, idx) => {
+    let tr = document.createElement('tr');
+    let rankColor = idx === 0 ? 'color:var(--accent);font-weight:bold' : (idx === 1 ? 'color:var(--success)' : '');
+    tr.innerHTML = `
+      <td style="width:36px;text-align:center;${rankColor}">#${idx + 1}</td>
+      <td>${u.name} ${u.banned ? '<span style="color:var(--danger)">[BANNED]</span>' : ''}</td>
+      <td style="text-align:right;font-weight:bold">${(u.points || 0).toLocaleString()} XP</td>
+    `;
+    lbox.appendChild(tr);
+  });
+}
+
+function renderAdminTable(users) {
+  let tbody = document.getElementById('admin-user-list');
+  if(!tbody) return;
+  tbody.innerHTML = '';
+  for(let key in users) {
+    let u = users[key];
+    let tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${u.name}</b></td>
+      <td>${u.points || 0} XP (${u.cheatCount || 0} lỗi)</td>
+      <td>
+        <button class="btn danger" style="min-height:28px;padding:3px 6px;font-size:10px;margin:0" onclick="adminToggleBan('${key}')">
+          ${u.isBanned ? 'GỠ BAN' : 'BAN'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function redeemCode() {
+  const code = document.getElementById('in-code').value.trim().toUpperCase();
+  if(!code) return alert('Vui lòng nhập mã code!');
+  
+  db.ref('codes/' + code).once('value').then((snap) => {
+    if(!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã code không tồn tại!');
+    if(state.redeemedCodes.includes(code)) return alert('Bạn đã nhập mã này rồi!');
+    
+    state.redeemedCodes.push(code);
+    state.points += 5000;
+    syncUserData();
+    document.getElementById('in-code').value = '';
+    popup('NHẬN THÀNH CÔNG +5.000 XP!');
+  });
+}
+
+function openRoom(roomId) {
+  if(state.isBanned) return;
+  state.currentRoom = roomId;
+  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'ĐỐ MẸO X10';
+  renderCurrentQuestion();
+  showScreen('screen-quiz');
+}
+
+function renderCurrentQuestion() {
+  const isR1 = state.currentRoom === 1;
+  const pool = isR1 ? state.pool1 : state.pool2;
+  let idx = isR1 ? state.idx1 : state.idx2;
+
+  if(idx >= pool.length) {
+    let seed = Math.floor(Math.random() * 9999);
+    if(isR1) { state.pool1 = generate50HackerQuestions(seed); state.idx1 = 0; idx = 0; }
+    else { state.pool2 = generate50RiddleQuestions(seed); state.idx2 = 0; idx = 0; }
+  }
+
+  const qObj = isR1 ? state.pool1[idx] : state.pool2[idx];
+  document.getElementById('q-progress').textContent = `CÂU ${idx + 1}/50`;
+  document.getElementById('q-reward').textContent = `THƯỞNG: +${qObj.pts} XP`;
+  document.getElementById('quiz-question').textContent = qObj.q;
+  document.getElementById('quiz-ans').value = '';
+  document.getElementById('quiz-exp').value = '';
+}
+
+function advanceQuestion() {
+  if(state.currentRoom === 1) state.idx1++;
+  else state.idx2++;
+  renderCurrentQuestion();
+}
+
+function evaluateAnswer(ansRaw, expRaw, qObj) {
+  const a = normalizeStr(ansRaw);
+  const e = normalizeStr(expRaw);
+  if(a.length < 1 || e.length < 10) return { ok: false, reason: 'Giải thích quá ngắn (tối thiểu 10 ký tự)!' };
+  if(/(.)\1{4,}/.test(e)) return { ok: false, reason: 'Phát hiện spam ký tự vô nghĩa!' };
+
+  let matchAns = qObj.ans.some(k => a.includes(normalizeStr(k)));
+  let matchExp = qObj.explain.some(k => e.includes(normalizeStr(k)));
+  if(!matchAns) return { ok: false, reason: 'Đáp án chưa chính xác!' };
+  if(!matchExp) return { ok: false, reason: 'Đáp án đúng nhưng giải thích chưa hợp lý!' };
+  return { ok: true, pts: qObj.pts };
+}
+
+function submitQuiz() {
+  const ans = document.getElementById('quiz-ans').value;
+  const exp = document.getElementById('quiz-exp').value;
+  if(!ans.trim() || !exp.trim()) return alert('Bắt buộc nhập cả Đáp án và Giải thích!');
+
+  const isR1 = state.currentRoom === 1;
+  const qObj = isR1 ? state.pool1[state.idx1] : state.pool2[state.idx2];
+  const res = evaluateAnswer(ans, exp, qObj);
+
+  if(res.ok) {
+    state.points += res.pts;
+    popup(`CHUẨN XÁC! +${res.pts} XP`);
+  } else {
+    state.points = Math.max(0, state.points - 300);
+    popup(`SAI (-300 XP): ${res.reason}`);
+  }
+  syncUserData();
+  setTimeout(advanceQuestion, 900);
+}
+
+function exitRoomWithPenalty() {
+  if(confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
+    let seed = Math.floor(Math.random() * 99999);
+    if(state.currentRoom === 1) { state.pool1 = generate50HackerQuestions(seed); state.idx1 = 0; }
+    if(state.currentRoom === 2) { state.pool2 = generate50RiddleQuestions(seed); state.idx2 = 0; }
+    state.currentRoom = 0;
+    showScreen('screen-home');
+  }
+}
+
+// PVP 1V1
+function createPvpRoom() {
+  const bet = +document.getElementById('pvp-bet').value;
+  if(state.points < bet) return alert('Số điểm không đủ để cược!');
+  
+  const code = Math.random().toString(36).substring(2,8).toUpperCase();
+  const qRand = state.pool2[Math.floor(Math.random() * state.pool2.length)];
+  const roomData = { code, host: state.name, bet, status: 'waiting', question: qRand, answers: {} };
+
+  db.ref('pvp_rooms/' + code).set(roomData);
+  state.points -= bet;
+  syncUserData();
+
+  state.pvp = { code, bet, isHost: true };
+  document.getElementById('pvp-display-code').textContent = code;
+  showScreen('screen-pvp-wait');
+
+  db.ref('pvp_rooms/' + code).on('value', (snap) => {
+    let r = snap.val();
+    if(r && r.status === 'playing') {
+      db.ref('pvp_rooms/' + code).off();
+      startPvpBattle(r);
+    }
+  });
+}
+
+function joinPvpRoom() {
+  const code = document.getElementById('pvp-join-code').value.trim().toUpperCase();
+  if(!code) return alert('Vui lòng nhập mã phòng!');
+
+  db.ref('pvp_rooms/' + code).once('value').then((snap) => {
+    let room = snap.val();
+    if(!room) return alert('Không tìm thấy mã phòng trực tuyến này!');
+    if(room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc!');
+    if(room.host === state.name) return alert('Không thể tự vào phòng của mình!');
+    if(state.points < room.bet) return alert('Bạn không đủ điểm cược!');
+
+    state.points -= room.bet;
+    syncUserData();
+
+    db.ref('pvp_rooms/' + code).update({ guest: state.name, status: 'playing' });
+    state.pvp = { code, bet: room.bet, isHost: false };
+    startPvpBattle(room);
+  });
+}
+
+function startPvpBattle(room) {
+  document.getElementById('pvp-q-box').textContent = room.question.q;
+  document.getElementById('pvp-ans').value = '';
+  document.getElementById('pvp-exp').value = '';
+  document.getElementById('pvp-play-badge').textContent = 'CƯỢC: ' + room.bet.toLocaleString() + ' XP';
+  showScreen('screen-pvp-play');
+
+  let left = 45;
+  document.getElementById('pvp-timer').textContent = left;
+  state.pvp.timer = setInterval(() => {
+    left--;
+    document.getElementById('pvp-timer').textContent = left;
+    if(left <= 0) { clearInterval(state.pvp.timer); submitPvpAnswer(); }
+  }, 1000);
+}
+
+function submitPvpAnswer() {
+  if(state.pvp.submitted) return;
+  state.pvp.submitted = true;
+  clearInterval(state.pvp.timer);
+
+  const ans = document.getElementById('pvp-ans').value;
+  const exp = document.getElementById('pvp-exp').value;
+
+  db.ref('pvp_rooms/' + state.pvp.code).once('value').then((snap) => {
+    let room = snap.val();
+    if(!room) return;
+    let res = evaluateAnswer(ans, exp, room.question);
+    let sc = res.ok ? res.pts : 0;
+
+    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    db.ref(`pvp_rooms/${state.pvp.code}/answers/${safeKey}`).set(sc);
+    popup('Đang chờ đối thủ nộp bài...');
+
+    db.ref('pvp_rooms/' + state.pvp.code).on('value', (s) => {
+      let r = s.val();
+      if(r && r.answers && Object.keys(r.answers).length >= 2) {
+        db.ref('pvp_rooms/' + state.pvp.code).off();
+        finishPvpBattle(r);
+      }
+    });
+  });
+}
+
+function finishPvpBattle(room) {
+  const names = Object.keys(room.answers || {});
+  let winnerKey = null;
+  if(names.length === 2) {
+    let s0 = room.answers[names[0]], s1 = room.answers[names[1]];
+    if(s0 > s1) winnerKey = names[0];
+    else if(s1 > s0) winnerKey = names[1];
+  }
+
+  const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+  const pot = room.bet * 2;
+  if(winnerKey === safeKey) {
+    state.points += pot;
+    alert('CHIẾN THẮNG! Nhận ' + pot.toLocaleString() + ' XP.');
+  } else if(!winnerKey) {
+    state.points += room.bet;
+    alert('HÒA KÈO! Hoàn điểm cược.');
+  } else {
+    alert('THUA TRẬN! Mất ' + room.bet.toLocaleString() + ' XP.');
+  }
+  
+  syncUserData();
+  db.ref('pvp_rooms/' + state.pvp.code).remove();
+  state.pvp = null;
+  showScreen('screen-home');
+}
+
+function cancelPvpRoom() {
+  if(state.pvp) {
+    if(state.pvp.isHost) {
+      state.points += state.pvp.bet;
+      syncUserData();
+      db.ref('pvp_rooms/' + state.pvp.code).remove();
+    }
+    state.pvp = null;
+    showScreen('screen-home');
+  }
+}
+
+function goHome() { showScreen('screen-home'); }
+
+function openVoucher() {
+  document.getElementById('v-name').textContent = state.name.toUpperCase() + ' (' + state.classId + ')';
+  document.getElementById('v-id').textContent = 'MÃ XÁC THỰC: 1911-' + Math.random().toString(36).substring(2,8).toUpperCase();
+  showScreen('screen-voucher');
+}
+
+function openAdmin() {
+  if(state.name.toUpperCase() !== 'ADMIN') return;
+  showScreen('screen-admin');
+}
+
+function adminToggleBan(key) {
+  db.ref('users/' + key).once('value').then(s => {
+    let u = s.val();
+    if(u) {
+      let newBanned = !u.isBanned;
+      db.ref('users/' + key).update({ isBanned: newBanned, cheatCount: newBanned ? u.cheatCount : 0 });
+      popup('Đã cập nhật trạng thái thành công');
+    }
+  });
+}
+
+function adminCreateCode() {
+  let newCode = document.getElementById('admin-new-code').value.trim().toUpperCase();
+  if(!newCode) return;
+  db.ref('codes/' + newCode).set(true);
+  document.getElementById('admin-new-code').value = '';
+  popup('TẠO MÃ THÀNH CÔNG: ' + newCode);
+}
+</script>
+</body>
+</html>
