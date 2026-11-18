@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // 19.11 CLOUD SYNC</title>
-<!-- Tích hợp Firebase SDK từ Google CDN -->
+<title>OVERLORD PROTOCOL // 19.11 STABLE</title>
+<!-- Thư viện Firebase SDK chuẩn từ Google CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -56,11 +56,11 @@ body::before {
 #app { position: relative; z-index: 2; min-height: 100dvh; padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom); max-width: 480px; margin: 0 auto; }
 
 .screen { display: none !important; min-height: 100dvh; flex-direction: column; justify-content: space-between; }
-.screen.active { display: flex !important; animation: panelIn 0.25s ease; }
+.screen.active { display: flex !important; animation: panelIn 0.2s ease; }
 
 @keyframes panelIn {
-  from { opacity: 0; transform: scale(0.98) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .top-bar {
@@ -169,18 +169,18 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div>
-      <div class="top-bar"><div class="brand">OVERLORD // CLOUD SYNC</div></div>
+      <div class="top-bar"><div class="brand">OVERLORD // STABLE SYNC</div></div>
       <div class="card" style="margin-top:20px">
         <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP TRỰC TUYẾN</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Đồng bộ điểm số trực tiếp với toàn bộ máy trong lớp qua đám mây.</p>
+        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Kết nối mượt mà, chống đứng đơ và đồng bộ thời gian thực.</p>
         <label>HỌ VÀ TÊN</label>
         <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
         <label>LỚP / SỐ HIỆU</label>
         <input id="in-class" type="text" placeholder="9A1" maxlength="20" autocomplete="off">
-        <button class="btn" onclick="loginAction()">KẾT NỐI ĐÁM MÂY</button>
+        <button class="btn" onclick="loginAction()">VÀO CHIẾN TRƯỜNG</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Cloud Sync Engine • Realtime Database Active</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Stable Protocol v6.2 Active</div>
   </div>
 
   <!-- HOME -->
@@ -191,14 +191,14 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div class="user-badge" id="lbl-points">0 XP</div>
       </div>
       <div class="card">
-        <div style="font-size:11px;color:var(--text-dim)">HỒ SƠ TÁC CHIẾN (CLOUD)</div>
+        <div style="font-size:11px;color:var(--text-dim)">HỒ SƠ TÁC CHIẾN</div>
         <div id="lbl-username" style="font-size:15px;color:var(--accent);margin:4px 0 8px;font-weight:700"></div>
         <div style="background:#020204;height:6px;border-radius:3px;overflow:hidden;border:1px solid var(--panel-border)">
           <div id="progress-bar" style="background:var(--success);width:0%;height:100%;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:5px">
           <span>Mốc quỹ: 10.000 XP</span>
-          <span style="color:var(--success)">⚡ Đang đồng bộ</span>
+          <span style="color:var(--success)">⚡ Đã kết nối đám mây</span>
         </div>
       </div>
 
@@ -211,10 +211,10 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         </div>
       </div>
 
-      <!-- BẢNG XẾP HẠNG REALTIME -->
+      <!-- BẢNG XẾP HẠNG -->
       <div class="card" style="border-color:var(--accent)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <h3 style="color:var(--accent);font-size:12px;letter-spacing:1px">🏆 BẢNG XẾP HẠNG TOÀN LỚP (REALTIME)</h3>
+          <h3 style="color:var(--accent);font-size:12px;letter-spacing:1px">🏆 BẢNG XẾP HẠNG TOÀN LỚP</h3>
           <span style="font-size:10px;color:var(--success)">● LIVE</span>
         </div>
         <div style="max-height:110px;overflow-y:auto">
@@ -361,11 +361,13 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
 </div>
 
 <script>
-// Cấu hình Firebase công khai miễn phí để đồng bộ toàn bộ học sinh trong lớp
+// Khởi tạo kết nối Firebase an toàn chống đứng đơ
 const firebaseConfig = {
   databaseURL: "https://overlord-1911-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.database();
 
 let state = {
@@ -379,31 +381,34 @@ let state = {
   pvp: null
 };
 
-// Lắng nghe dữ liệu realtime từ Firebase cho Bảng xếp hạng
+// Đồng bộ danh sách người dùng realtime
 db.ref('users').on('value', (snapshot) => {
   const users = snapshot.val() || {};
   renderLeaderboard(users);
   renderAdminTable(users);
   
-  if(state.name && users[state.name]) {
-    let u = users[state.name];
-    state.points = u.points || 0;
-    state.isBanned = u.isBanned || false;
-    state.cheatCount = u.cheatCount || 0;
-    state.redeemedCodes = u.redeemedCodes || [];
-    state.hasFiredFireworks = u.hasFiredFireworks || false;
-    
-    if(state.isBanned) {
-      document.getElementById('banned-box').classList.add('show');
+  if(state.name) {
+    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    if(users[safeKey]) {
+      let u = users[safeKey];
+      state.points = u.points || 0;
+      state.isBanned = u.isBanned || false;
+      state.cheatCount = u.cheatCount || 0;
+      state.redeemedCodes = u.redeemedCodes || [];
+      state.hasFiredFireworks = u.hasFiredFireworks || false;
+      
+      if(state.isBanned) {
+        document.getElementById('banned-box').classList.add('show');
+      }
+      updateHomeUI();
     }
-    updateHomeUI();
   }
 });
 
 function syncUserData() {
   if(!state.name) return;
-  const safeName = state.name.replace(/[.#$\/\[\]]/g, '_');
-  db.ref('users/' + safeName).set({
+  const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+  db.ref('users/' + safeKey).set({
     name: state.name,
     classId: state.classId,
     points: state.points,
@@ -414,7 +419,6 @@ function syncUserData() {
   });
 }
 
-// BỘ CÂU HỎI 50 CÂU
 function generate50HackerQuestions(seed) {
   const generators = [
     (i) => {
@@ -530,11 +534,13 @@ function loginAction() {
   state.pool2 = generate50RiddleQuestions(seed);
   state.idx1 = 0; state.idx2 = 0;
 
-  const safeName = name.replace(/[.#$\/\[\]]/g, '_');
-  db.ref('users/' + safeName).once('snapshot', (snap) => {
+  const safeKey = name.replace(/[.#$\/\[\]]/g, '_');
+  db.ref('users/' + safeKey).once('value').then((snap) => {
     if(!snap.exists()) {
-      db.ref('users/' + safeName).set({ name, classId: cls, points: 0, isBanned: false, cheatCount: 0, redeemedCodes: [], hasFiredFireworks: false });
+      db.ref('users/' + safeKey).set({ name, classId: cls, points: 0, isBanned: false, cheatCount: 0, redeemedCodes: [], hasFiredFireworks: false });
     }
+  }).catch(err => {
+    console.log("Firebase sync init error:", err);
   });
 
   initWatermark(name, cls);
@@ -583,11 +589,30 @@ function renderLeaderboard(users) {
   });
 }
 
+function renderAdminTable(users) {
+  let tbody = document.getElementById('admin-user-list');
+  tbody.innerHTML = '';
+  for(let key in users) {
+    let u = users[key];
+    let tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${u.name}</b></td>
+      <td>${u.points} XP (${u.cheatCount || 0} lỗi)</td>
+      <td>
+        <button class="btn danger" style="min-height:28px;padding:3px 6px;font-size:10px;margin:0" onclick="adminToggleBan('${key}')">
+          ${u.isBanned ? 'GỠ BAN' : 'BAN'}
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
 function redeemCode() {
   const code = document.getElementById('in-code').value.trim().toUpperCase();
   if(!code) return alert('Vui lòng nhập mã code!');
   
-  db.ref('codes/' + code).once('value', (snap) => {
+  db.ref('codes/' + code).once('value').then((snap) => {
     if(!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã code không tồn tại!');
     if(state.redeemedCodes.includes(code)) return alert('Bạn đã nhập mã này rồi!');
     
@@ -675,7 +700,7 @@ function exitRoomWithPenalty() {
   }
 }
 
-// ============ PVP 1V1 REALTIME CLOUD ============
+// PVP 1V1
 function createPvpRoom() {
   const bet = +document.getElementById('pvp-bet').value;
   if(state.points < bet) return alert('Số điểm không đủ để cược!');
@@ -705,7 +730,7 @@ function joinPvpRoom() {
   const code = document.getElementById('pvp-join-code').value.trim().toUpperCase();
   if(!code) return alert('Vui lòng nhập mã phòng!');
 
-  db.ref('pvp_rooms/' + code).once('value', (snap) => {
+  db.ref('pvp_rooms/' + code).once('value').then((snap) => {
     let room = snap.val();
     if(!room) return alert('Không tìm thấy mã phòng trực tuyến này!');
     if(room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc!');
@@ -745,13 +770,14 @@ function submitPvpAnswer() {
   const ans = document.getElementById('pvp-ans').value;
   const exp = document.getElementById('pvp-exp').value;
 
-  db.ref('pvp_rooms/' + state.pvp.code).once('value', (snap) => {
+  db.ref('pvp_rooms/' + state.pvp.code).once('value').then((snap) => {
     let room = snap.val();
     if(!room) return;
     let res = evaluateAnswer(ans, exp, room.question);
     let sc = res.ok ? res.pts : 0;
 
-    db.ref(`pvp_rooms/${state.pvp.code}/answers/${state.name}`).set(sc);
+    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    db.ref(`pvp_rooms/${state.pvp.code}/answers/${safeKey}`).set(sc);
     popup('Đang chờ đối thủ nộp bài...');
 
     db.ref('pvp_rooms/' + state.pvp.code).on('value', (s) => {
@@ -766,18 +792,19 @@ function submitPvpAnswer() {
 
 function finishPvpBattle(room) {
   const names = Object.keys(room.answers || {});
-  let winner = null;
+  let winnerKey = null;
   if(names.length === 2) {
     let s0 = room.answers[names[0]], s1 = room.answers[names[1]];
-    if(s0 > s1) winner = names[0];
-    else if(s1 > s0) winner = names[1];
+    if(s0 > s1) winnerKey = names[0];
+    else if(s1 > s0) winnerKey = names[1];
   }
 
+  const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
   const pot = room.bet * 2;
-  if(winner === state.name) {
+  if(winnerKey === safeKey) {
     state.points += pot;
     alert('CHIẾN THẮNG! Nhận ' + pot.toLocaleString() + ' XP.');
-  } else if(!winner) {
+  } else if(!winnerKey) {
     state.points += room.bet;
     alert('HÒA KÈO! Hoàn điểm cược.');
   } else {
@@ -815,32 +842,13 @@ function openAdmin() {
   showScreen('screen-admin');
 }
 
-function renderAdminTable(users) {
-  let tbody = document.getElementById('admin-user-list');
-  tbody.innerHTML = '';
-  for(let username in users) {
-    let u = users[username];
-    let tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><b>${u.name}</b></td>
-      <td>${u.points} XP (${u.cheatCount || 0} lỗi)</td>
-      <td>
-        <button class="btn danger" style="min-height:28px;padding:3px 6px;font-size:10px;margin:0" onclick="adminToggleBan('${username}')">
-          ${u.isBanned ? 'GỠ BAN' : 'BAN'}
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-}
-
-function adminToggleBan(username) {
-  db.ref('users/' + username).once('snap', s => {
+function adminToggleBan(key) {
+  db.ref('users/' + key).once('value').then(s => {
     let u = s.val();
     if(u) {
       let newBanned = !u.isBanned;
-      db.ref('users/' + username).update({ isBanned: newBanned, cheatCount: newBanned ? u.cheatCount : 0 });
-      popup('Đã cập nhật trạng thái ' + username);
+      db.ref('users/' + key).update({ isBanned: newBanned, cheatCount: newBanned ? u.cheatCount : 0 });
+      popup('Đã cập nhật trạng thái thành công');
     }
   });
 }
@@ -850,49 +858,7 @@ function adminCreateCode() {
   if(!newCode) return;
   db.ref('codes/' + newCode).set(true);
   document.getElementById('admin-new-code').value = '';
-  popup('TẠO MÃ CLOUD THÀNH CÔNG: ' + newCode);
-}
-
-// ANTI-CHEAT
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('selectstart', e => { if(!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) e.preventDefault(); });
-document.addEventListener('keydown', e => {
-  if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U') || e.key === 'PrintScreen') {
-    e.preventDefault(); triggerPunishment('Phát hiện phím tắt / Chụp màn hình');
-  }
-});
-
-let blurTimer = null;
-function handleFocusLoss() {
-  if(state.name && state.name.toUpperCase() !== 'ADMIN' && (state.currentRoom > 0 || state.pvp)) {
-    document.getElementById('alert-box').classList.add('show');
-    document.getElementById('alert-msg').textContent = 'Cảnh báo: Rời màn hình thi sẽ bị trừ 2.000 XP!';
-    clearTimeout(blurTimer);
-    blurTimer = setTimeout(() => triggerPunishment('Rời màn hình quá lâu'), 1500);
-  }
-}
-function handleFocusGain() { clearTimeout(blurTimer); document.getElementById('alert-box').classList.remove('show'); }
-
-window.addEventListener('blur', handleFocusLoss);
-window.addEventListener('focus', handleFocusGain);
-document.addEventListener('visibilitychange', () => { if(document.hidden) handleFocusLoss(); else handleFocusGain(); });
-
-function triggerPunishment(reason) {
-  if(state.isBanned) return;
-  state.cheatCount++;
-  state.points = Math.max(0, state.points - 2000);
-  
-  if(state.cheatCount >= 3 || state.pvp) {
-    state.isBanned = true;
-    syncUserData();
-    document.getElementById('alert-box').classList.remove('show');
-    document.getElementById('banned-box').classList.add('show');
-    return;
-  }
-  syncUserData();
-  document.getElementById('alert-msg').textContent = `${reason} (Vi phạm ${state.cheatCount}/3)`;
-  document.getElementById('alert-box').classList.add('show');
-  setTimeout(() => document.getElementById('alert-box').classList.remove('show'), 2500);
+  popup('TẠO MÃ THÀNH CÔNG: ' + newCode);
 }
 </script>
 </body>
