@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // 19.11 FINAL STABLE</title>
+<title>OVERLORD PROTOCOL // FIXED STABLE</title>
 <!-- Firebase SDK CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -169,10 +169,10 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div>
-      <div class="top-bar"><div class="brand">OVERLORD // 19.11 CLOUD</div></div>
+      <div class="top-bar"><div class="brand">OVERLORD // CLOUD SYNC</div></div>
       <div class="card" style="margin-top:20px">
         <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP HỆ THỐNG</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Đồng bộ đám mây trực tuyến, chống đứng đơ 100%.</p>
+        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Đồng bộ đám mây trực tuyến chính xác 100%.</p>
         <label>HỌ VÀ TÊN</label>
         <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
         <label>LỚP / SỐ HIỆU</label>
@@ -180,7 +180,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <button class="btn" onclick="loginAction()">TRUY CẬP CHIẾN TRƯỜNG</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Anti-Cheat v6.5 • Stable Cloud Sync</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Anti-Cheat v6.5 • Realtime Sync</div>
   </div>
 
   <!-- HOME -->
@@ -220,7 +220,9 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div style="max-height:110px;overflow-y:auto">
           <table class="leaderboard-table">
             <thead><tr><th>Hạng</th><th>Tên Thành Viên</th><th>Điểm XP</th></tr></thead>
-            <tbody id="leaderboard-list"></tbody>
+            <tbody id="leaderboard-list">
+              <tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Đang tải dữ liệu...</td></tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -308,7 +310,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- VOUCHER -->
   <div id="screen-voucher" class="screen" style="justify-content:center">
     <div class="card" style="text-align:center;border-color:var(--accent)">
-      <h2 style="color:var(--accent);letter-spacing:2px;margin-bottom:6px">SÉC QUÀ TẶNG 19/11</h2>
+      <h2 style="color:var(--accent);letter-spacing:2px;margin-bottom:6px">SÉC QUÀ TẶNG</h2>
       <div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">BAN TỔ CHỨC NAM SINH LỚP HỌC</div>
       <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0" id="v-name"></div>
       <div style="font-size:32px;font-weight:800;color:var(--success);margin:8px 0;">10.000 VNĐ</div>
@@ -349,21 +351,20 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <div id="alert-box" class="alert-overlay">
     <h2 style="color:var(--danger);margin-bottom:8px">🚨 PHÁT HIỆN GIAN LẬN</h2>
     <p id="alert-msg" style="font-size:14px;margin-bottom:10px;color:var(--text)"></p>
-    <p style="font-size:12px;color:var(--accent)">• Trừ thẳng 2.000 XP<br>• Hủy toàn bộ 50 câu cũ & tạo mới 50 câu khác!</p>
   </div>
 
   <div id="banned-box" class="banned-overlay">
     <h1 style="font-size:32px;margin-bottom:8px;">BỊ KHÓA TRUY CẬP</h1>
-    <p style="font-size:13px;line-height:1.5">Tài khoản đã bị khóa vĩnh viễn do vi phạm Anti-Cheat 3 lần<br>hoặc thoát ngang khi đang đấu 1v1.</p>
+    <p style="font-size:13px;line-height:1.5">Tài khoản đã bị khóa vĩnh viễn do vi phạm quy tắc.</p>
   </div>
 
   <div id="popup-notify" class="popup-notify"></div>
 </div>
 
 <script>
-// Khởi tạo kết nối Firebase Realtime an toàn
+// Kết nối trực tiếp chuẩn xác với Firebase Database của bạn
 const firebaseConfig = {
-  databaseURL: "https://overlord-1911-default-rtdb.asia-southeast1.firebasedatabase.app"
+  databaseURL: "https://studio-3689830403-7b5c9-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -381,7 +382,7 @@ let state = {
   pvp: null
 };
 
-// Lắng nghe dữ liệu người dùng realtime toàn cục
+// Lắng nghe realtime toàn cục để cập nhật bảng xếp hạng
 db.ref('users').on('value', (snapshot) => {
   const users = snapshot.val() || {};
   renderLeaderboard(users);
@@ -419,7 +420,7 @@ function syncUserData() {
   });
 }
 
-// BỘ SINH 50 CÂU HỎI
+// BỘ SINH CÂU HỎI
 function generate50HackerQuestions(seed) {
   const generators = [
     (i) => {
@@ -431,11 +432,6 @@ function generate50HackerQuestions(seed) {
     (i) => {
       let limit = 5 + ((i + seed) % 12);
       return { q: `[Vòng lặp bẫy #${i}]\nint dem = 0;\nfor(int i = 1; i <= ${limit}; i++) {\n  if(i % 2 == 0) _____;\n}\n// Đếm số chẵn từ 1 đến ${limit}`, ans: ['dem++', 'dem += 1', '++dem'], explain: ['tang', 'bien dem', 'chia het'], pts: 500 };
-    },
-    (i) => {
-      let len = 6 + (i % 5);
-      let idx = (i + seed) % len;
-      return { q: `[Mảng C++ #${i}]\nMảng có ${len} phần tử từ 0.\nLấy phần tử thứ ${idx + 1} từ trái sang:\narr[_____]`, ans: [String(idx)], explain: ['bat dau tu 0', 'chi so', 'index'], pts: 450 };
     }
   ];
   let list = [];
@@ -446,8 +442,7 @@ function generate50HackerQuestions(seed) {
 function generate50RiddleQuestions(seed) {
   const staticHard = [
     { q: "Người đàn ông đẩy xe tới khách sạn và biết mình phá sản?", ans: ["co ty phu", "choi co"], explain: ["ban co", "tro choi"], pts: 550 },
-    { q: "Có 3 bóng đèn kín và 3 công tắc ngoài cửa. Vào phòng 1 lần duy nhất để biết đèn nào?", ans: ["bat 1 cai lau", "so bong nong"], explain: ["nong", "am", "sang"], pts: 650 },
-    { q: "Chọn phòng tử hình: 1 Lửa cháy, 2 Sát thủ cầm súng, 3 Sư tử đói 3 năm?", ans: ["phong 3", "so 3", "ba"], explain: ["chet", "bo doi 3 nam"], pts: 500 }
+    { q: "Có 3 bóng đèn kín và 3 công tắc ngoài cửa. Vào phòng 1 lần duy nhất để biết đèn nào?", ans: ["bat 1 cai lau", "so bong nong"], explain: ["nong", "am", "sang"], pts: 650 }
   ];
   let list = [...staticHard];
   while(list.length < 50) {
@@ -502,7 +497,7 @@ function normalizeStr(s) {
 
 function initWatermark(name, cls) {
   let html = '';
-  for(let i=0; i<16; i++) html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}] 19/11</span>`;
+  for(let i=0; i<16; i++) html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}]</span>`;
   document.getElementById('watermark-layer').innerHTML = html;
 }
 
@@ -566,7 +561,6 @@ function updateHomeUI() {
   }
   document.getElementById('btn-voucher').style.display = (state.points >= 10000) ? 'block' : 'none';
   
-  // Hiển thị nút Admin ngay lập tức nếu là ADMIN
   if(state.name.toUpperCase() === 'ADMIN') {
     document.getElementById('btn-admin').style.display = 'block';
   } else {
@@ -579,6 +573,7 @@ function renderLeaderboard(users) {
   userArr.sort((a, b) => b.points - a.points);
 
   let lbox = document.getElementById('leaderboard-list');
+  if(!lbox) return;
   lbox.innerHTML = '';
   if(userArr.length === 0) {
     lbox.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Chưa có dữ liệu</td></tr>`;
@@ -841,7 +836,7 @@ function goHome() { showScreen('screen-home'); }
 
 function openVoucher() {
   document.getElementById('v-name').textContent = state.name.toUpperCase() + ' (' + state.classId + ')';
-  document.getElementById('v-id').textContent = 'MÃ XÁC THỰC: 1911-' + Math.random().toString(36).substring(2,8).toUpperCase();
+  document.getElementById('v-id').textContent = 'MÃ XÁC THỰC: ' + Math.random().toString(36).substring(2,8).toUpperCase();
   showScreen('screen-voucher');
 }
 
