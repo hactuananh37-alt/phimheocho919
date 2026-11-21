@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // PERCENT DIFFICULTY</title>
+<title>OVERLORD PROTOCOL // RESET NO-REPEAT</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -313,7 +313,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
       <div class="top-bar"><div class="brand">OVERLORD // % DIFF</div></div>
       <div class="card" style="margin-top:20px">
         <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP HỆ THỐNG</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó, tăng tiền tăng % • Chỉ điền đáp án.</p>
+        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó, tăng tiền tăng % • Reset không lặp câu.</p>
         <label>HỌ VÀ TÊN</label>
         <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
         <label>LỚP / SỐ HIỆU</label>
@@ -321,7 +321,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <button class="btn" onclick="loginAction()">TRUY CẬP CHIẾN TRƯỜNG</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Scaling % Difficulty • Answer Only</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Unique Reset Pool • Answer Only</div>
   </div>
 
   <!-- HOME -->
@@ -350,7 +350,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div class="grid-2">
           <div>
             <label>MỐC XP NHẬN</label>
-            <input id="cfg-target-xp" type="number" min="1000" step="500" value="10000" style="margin:0">
+            <input id="cfg-target-xp" type="number" min="500" step="500" value="10000" style="margin:0">
           </div>
           <div>
             <label>TIỀN THƯỞNG (VNĐ)</label>
@@ -538,15 +538,19 @@ let state = {
   pool2: [],
   idx1: 0,
   idx2: 0,
+  recentIds: new Set(),
   redeemedCodes: [],
   hasFiredFireworks: false,
   pvp: null
 };
 
-// 10k VNĐ = +10% độ khó, tăng thêm 10k thì tăng thêm +10% (tối thiểu +10%)
+function createUniqueSeed() {
+  const randPart = Math.floor(Math.random() * 1000000);
+  return (Date.now() % 1000000) + randPart;
+}
+
 function getDifficultyPercent() {
-  const pct = Math.max(10, Math.round((state.rewardVnd / 10000) * 10));
-  return pct;
+  return Math.max(10, Math.round((state.rewardVnd / 10000) * 10));
 }
 
 function getDifficultyMultiplier() {
@@ -691,100 +695,138 @@ function shuffleArray(arr) {
   return copy;
 }
 
-// BỘ 50 CÂU HỎI PHÒNG 1 (TĂNG THEO % TIỀN THƯỞNG)
+// BỘ 50 CÂU HỎI PHÒNG 1 (ĐA DẠNG, KHÔNG LẶP KHI RESET)
 function generate50HackerQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
-  const s = (seed % 90) + 10;
+  const s = (seed % 997) + 17;
   const pts = Math.round(450 * mult);
   const items = [];
+  const scale = Math.max(1, Math.round(mult * 10));
 
   for (let i = 1; i <= 50; i++) {
-    const scale = Math.max(1, Math.round(mult * 10));
-    if (i % 4 === 1) {
-      const a = (((i * 2 + s) % 8) + 2) * scale;
-      const b = (((i * 3 + s) % 6) + 2) * scale;
-      const c = (((i + s) % 5) + 1) * scale;
-      const expr = pct >= 30 ? `(a + b) * 2 - ${c}` : `a * 2 + ${b}`;
+    const r1 = ((i * 7 + s) % 9) + 2;
+    const r2 = ((i * 11 + s) % 8) + 2;
+    const r3 = ((i * 13 + s) % 6) + 2;
+    const kind = i % 5;
+
+    if (kind === 1) {
+      const a = r1 * scale;
+      const b = r2 * scale;
+      const c = r3 * scale;
       const ansVal = pct >= 30 ? (a + b) * 2 - c : a * 2 + b;
-      items.push({
-        id: `H-${i}`,
-        pct,
-        q: `[+${pct}% | C++ #${i}] Cho a = ${a}, b = ${b}.\nTính giá trị biểu thức: ${expr}`,
-        ans: [String(ansVal)],
-        pts
-      });
-    } else if (i % 4 === 2) {
-      const n = Math.min(25, (((i + s) % 6) + 4) + Math.floor(pct / 15));
+      const exprText = pct >= 30 ? `(a + b) * 2 - ${c}` : `a * 2 + ${b}`;
+      const id = `H1-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({ id, pct, q: `[+${pct}% | #${i}] a = ${a}, b = ${b}. Tính: ${exprText}`, ans: [String(ansVal)], pts });
+      }
+    } else if (kind === 2) {
+      const n = Math.min(30, r1 + 4 + Math.floor(pct / 15));
       const sum = (n * (n + 1)) / 2;
-      items.push({
-        id: `H-${i}`,
-        pct,
-        q: `[+${pct}% | Vòng lặp #${i}] Tính tổng các số nguyên từ 1 đến ${n}.`,
-        ans: [String(sum)],
-        pts
-      });
-    } else if (i % 4 === 3) {
-      const dec = (((i * 4 + s) % 20) + 8) * Math.max(1, Math.floor(mult));
-      items.push({
-        id: `H-${i}`,
-        pct,
-        q: `[+${pct}% | Nhị phân #${i}] Đổi số thập phân ${dec} sang hệ nhị phân (binary).`,
-        ans: [dec.toString(2)],
-        pts
-      });
+      const id = `H2-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({ id, pct, q: `[+${pct}% | #${i}] Tính tổng các số nguyên từ 1 đến ${n}.`, ans: [String(sum)], pts });
+      }
+    } else if (kind === 3) {
+      const dec = (r1 + r2 + 5) * Math.max(1, Math.floor(mult));
+      const id = `H3-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({ id, pct, q: `[+${pct}% | #${i}] Đổi số thập phân ${dec} sang hệ nhị phân (binary).`, ans: [dec.toString(2)], pts });
+      }
+    } else if (kind === 4) {
+      const len = 6 + r3 + Math.floor(pct / 20);
+      const pos = ((i + r1) % len) + 1;
+      const id = `H4-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({ id, pct, q: `[+${pct}% | #${i}] Mảng ${len} phần tử đánh số từ 0.\nChỉ số (index) của phần tử thứ ${pos} là bao nhiêu?`, ans: [String(pos - 1)], pts });
+      }
     } else {
-      const len = 6 + (i % 6) + Math.floor(pct / 20);
-      const pos = (i % len) + 1;
-      items.push({
-        id: `H-${i}`,
-        pct,
-        q: `[+${pct}% | Mảng #${i}] Mảng ${len} phần tử đánh số từ 0.\nChỉ số (index) của phần tử thứ ${pos} là bao nhiêu?`,
-        ans: [String(pos - 1)],
-        pts
-      });
+      const x = r1 * scale;
+      const y = r2;
+      const ansVal = x * y + r3;
+      const id = `H5-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({ id, pct, q: `[+${pct}% | #${i}] Biến k = ${x}. Thực hiện k = k * ${y} + ${r3}.\nGiá trị k sau cùng là bao nhiêu?`, ans: [String(ansVal)], pts });
+      }
     }
   }
-  return shuffleArray(items);
+
+  // Bù đủ 50 câu nếu bị lọc
+  let extraIdx = 1;
+  while (items.length < 50) {
+    const u = ((extraIdx * 19 + s) % 25) + 5;
+    const v = ((extraIdx * 23 + s) % 12) + 2;
+    items.push({
+      id: `HX-${seed}-${extraIdx}`,
+      pct,
+      q: `[+${pct}% | Mở rộng #${extraIdx}] Tính giá trị ${u} * ${v} + ${extraIdx}.`,
+      ans: [String(u * v + extraIdx)],
+      pts
+    });
+    extraIdx++;
+  }
+
+  return shuffleArray(items).slice(0, 50);
 }
 
-// BỘ 50 CÂU HỎI PHÒNG 2 (TĂNG THEO % TIỀN THƯỞNG)
+// BỘ 50 CÂU HỎI PHÒNG 2 (ĐA DẠNG, KHÔNG LẶP KHI RESET)
 function generate50RiddleQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
-  const s = (seed % 60) + 1;
+  const s = (seed % 991) + 13;
   const pts = Math.round(500 * mult);
   const items = [];
 
   const riddles = [
-    { q: "Người đàn ông đẩy xe nhỏ tới khách sạn và biết mình phá sản. Anh ta đang chơi trò gì?", ans: ["co ty phu", "choi co ty phu"] },
-    { q: "Có 3 bóng đèn trong phòng kín và 3 công tắc ở ngoài. Vào phòng 1 lần duy nhất để biết đèn nào dùng công tắc nào bằng cách nào?", ans: ["bat 1 cai lau roi tat", "so do am bong den", "kiem tra do nong"] },
-    { q: "Chọn phòng an toàn nhất: 1 - Phòng lửa cháy lớn, 2 - Phòng sát thủ cầm súng, 3 - Phòng sư tử bị bỏ đói 3 năm.", ans: ["phong 3", "3", "so 3"] },
-    { q: "Bác sĩ cho 3 viên thuốc, uống mỗi viên cách nhau 30 phút. Hỏi uống hết cả 3 viên mất bao lâu?", ans: ["60 phut", "1 gio", "60"] },
-    { q: "Một người chạy đua vượt qua người đang đứng thứ 2. Người đó đang ở vị trí thứ mấy?", ans: ["thu 2", "2", "so 2"] },
-    { q: "Cái gì thuộc về bạn nhưng người khác lại dùng nhiều hơn bạn?", ans: ["ten", "ten cua ban"] },
-    { q: "Tháng nào trong năm có 28 ngày?", ans: ["tat ca cac thang", "moi thang", "thang nao cung co"] }
+    { key: 'R-CO-TY-PHU', q: "Người đàn ông đẩy xe nhỏ tới khách sạn và biết mình phá sản. Anh ta đang chơi trò gì?", ans: ["co ty phu", "choi co ty phu"] },
+    { key: 'R-3-BONG-DEN', q: "Có 3 bóng đèn trong phòng kín và 3 công tắc ở ngoài. Vào phòng 1 lần duy nhất để biết đèn nào dùng công tắc nào bằng cách nào?", ans: ["bat 1 cai lau roi tat", "so do am bong den", "kiem tra do nong"] },
+    { key: 'R-PHONG-3', q: "Chọn phòng an toàn nhất: 1 - Phòng lửa cháy lớn, 2 - Phòng sát thủ cầm súng, 3 - Phòng sư tử bị bỏ đói 3 năm.", ans: ["phong 3", "3", "so 3"] },
+    { key: 'R-3-VIEN-THUOC', q: "Bác sĩ cho 3 viên thuốc, uống mỗi viên cách nhau 30 phút. Hỏi uống hết cả 3 viên mất bao lâu?", ans: ["60 phut", "1 gio", "60"] },
+    { key: 'R-VUOT-THU-2', q: "Một người chạy đua vượt qua người đang đứng thứ 2. Người đó đang ở vị trí thứ mấy?", ans: ["thu 2", "2", "so 2"] },
+    { key: 'R-TEN-BAN', q: "Cái gì thuộc về bạn nhưng người khác lại dùng nhiều hơn bạn?", ans: ["ten", "ten cua ban"] },
+    { key: 'R-28-NGAY', q: "Tháng nào trong năm có 28 ngày?", ans: ["tat ca cac thang", "moi thang", "thang nao cung co"] },
+    { key: 'R-CAI-AO', q: "Cái gì càng cắt càng dài ra?", ans: ["cai ao", "ao", "con muong", "duong ham"] },
+    { key: 'R-NGAY-MAI', q: "Cái gì luôn đi tới nhưng không bao giờ tới nơi?", ans: ["ngay mai", "tuong lai"] },
+    { key: 'R-10-CON-CHIM', q: "Có 10 con chim đậu trên cành, thợ săn bắn rụng 1 con. Trên cành còn lại bao nhiêu con?", ans: ["0", "khong con nao", "het"] }
   ];
 
   for (let i = 1; i <= 50; i++) {
-    if (i <= riddles.length && pct <= 20) {
-      const r = riddles[i - 1];
-      items.push({ id: `R-${i}`, pct, q: `[+${pct}% | Câu #${i}] ${r.q}`, ans: r.ans, pts });
+    const r = riddles[(i + s) % riddles.length];
+    if (i <= 15 && pct <= 20 && !state.recentIds.has(r.key)) {
+      items.push({ id: `${r.key}-${seed}-${i}`, pct, q: `[+${pct}% | #${i}] ${r.q}`, ans: r.ans, pts });
     } else {
       const step = Math.max(1, Math.floor(pct / 10));
-      const child = (((i + s) % 6) + 3) * step;
+      const child = (((i * 3 + s) % 7) + 3) * step;
       const multAge = ((i + s) % 3) + 2;
       const total = child * (multAge + 1);
-      items.push({
-        id: `R-${i}`,
-        pct,
-        q: `[+${pct}% | Logic #${i}] Tuổi bố gấp ${multAge} lần tuổi con. Tổng tuổi bố và con hiện nay là ${total}. Hỏi tuổi bố là bao nhiêu?`,
-        ans: [String(child * multAge)],
-        pts
-      });
+      const id = `RL-${seed}-${i}`;
+      if (!state.recentIds.has(id)) {
+        items.push({
+          id,
+          pct,
+          q: `[+${pct}% | Logic #${i}] Tuổi bố gấp ${multAge} lần tuổi con. Tổng tuổi bố và con hiện nay là ${total}. Hỏi tuổi bố là bao nhiêu?`,
+          ans: [String(child * multAge)],
+          pts
+        });
+      }
     }
   }
-  return shuffleArray(items);
+
+  let extraIdx = 1;
+  while (items.length < 50) {
+    const a = ((extraIdx * 5 + s) % 9) + 2;
+    const b = ((extraIdx * 7 + s) % 8) + 2;
+    items.push({
+      id: `RX-${seed}-${extraIdx}`,
+      pct,
+      q: `[+${pct}% | Tư duy #${extraIdx}] Một dãy số bắt đầu từ ${a}, mỗi bước cộng thêm ${b}. Số ở bước thứ 3 là bao nhiêu?`,
+      ans: [String(a + b * 3)],
+      pts
+    });
+    extraIdx++;
+  }
+
+  return shuffleArray(items).slice(0, 50);
 }
 
 class FireworkSystem {
@@ -881,10 +923,11 @@ function loginAction() {
 
   state.name = name;
   state.classId = cls;
+  state.recentIds.clear();
 
-  const seed = Math.floor(Math.random() * 9999);
+  const seed = createUniqueSeed();
   state.pool1 = generate50HackerQuestions(seed);
-  state.pool2 = generate50RiddleQuestions(seed);
+  state.pool2 = generate50RiddleQuestions(seed + 77);
   state.idx1 = 0;
   state.idx2 = 0;
 
@@ -1005,7 +1048,7 @@ function redeemCode() {
 function openRoom(roomId) {
   if (state.isBanned) return;
   state.currentRoom = roomId;
-  const seed = Date.now() + Math.floor(Math.random() * 1000);
+  const seed = createUniqueSeed();
   if (roomId === 1) {
     state.pool1 = generate50HackerQuestions(seed);
     state.idx1 = 0;
@@ -1020,23 +1063,31 @@ function openRoom(roomId) {
 
 function renderCurrentQuestion() {
   const isR1 = state.currentRoom === 1;
-  const pool = isR1 ? state.pool1 : state.pool2;
+  let pool = isR1 ? state.pool1 : state.pool2;
   let idx = isR1 ? state.idx1 : state.idx2;
 
-  if (idx >= pool.length) {
-    const seed = Date.now() + Math.floor(Math.random() * 1000);
+  if (!pool || idx >= pool.length) {
+    const seed = createUniqueSeed();
     if (isR1) {
       state.pool1 = generate50HackerQuestions(seed);
       state.idx1 = 0;
+      pool = state.pool1;
       idx = 0;
     } else {
       state.pool2 = generate50RiddleQuestions(seed);
       state.idx2 = 0;
+      pool = state.pool2;
       idx = 0;
     }
   }
 
-  const qObj = (isR1 ? state.pool1 : state.pool2)[idx];
+  const qObj = pool[idx];
+  state.recentIds.add(qObj.id);
+  if (state.recentIds.size > 40) {
+    const firstKey = state.recentIds.values().next().value;
+    state.recentIds.delete(firstKey);
+  }
+
   document.getElementById('q-progress').textContent = `CÂU ${idx + 1}/50`;
   document.getElementById('q-diff').textContent = `ĐỘ KHÓ: +${qObj.pct}%`;
   document.getElementById('q-reward').textContent = `THƯỞNG: +${qObj.pts} XP`;
@@ -1085,7 +1136,7 @@ function submitQuiz() {
 
 function exitRoomWithPenalty() {
   if (confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
-    const seed = Date.now() + Math.floor(Math.random() * 99999);
+    const seed = createUniqueSeed();
     if (state.currentRoom === 1) {
       state.pool1 = generate50HackerQuestions(seed);
       state.idx1 = 0;
@@ -1105,7 +1156,7 @@ function createPvpRoom() {
   if (state.points < bet) return alert('Số điểm không đủ để cược!');
 
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-  const pool = state.pool2.length ? state.pool2 : generate50RiddleQuestions(Date.now());
+  const pool = state.pool2.length ? state.pool2 : generate50RiddleQuestions(createUniqueSeed());
   const qRand = pool[Math.floor(Math.random() * pool.length)];
   const roomData = { code, host: state.name, bet, status: 'waiting', question: qRand, answers: {} };
 
