@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // STRUCTURED QUESTION BANK</title>
+<title>OVERLORD PROTOCOL // HARDENED DEFENSE v8.2</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -42,8 +42,8 @@ html, body {
 }
 
 body.privacy-blur #app {
-  filter: blur(18px) brightness(0.25);
-  transition: filter 0.08s linear;
+  filter: blur(22px) brightness(0.18);
+  transition: filter 0.06s linear;
 }
 
 body::before {
@@ -65,7 +65,7 @@ body::before {
   pointer-events: none;
   z-index: 998;
   overflow: hidden;
-  opacity: 0.07;
+  opacity: 0.09;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
@@ -209,7 +209,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   border: 1px solid #1f241a;
   border-radius: 6px;
   padding: 14px;
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.55;
   color: var(--success);
   white-space: pre-wrap;
@@ -264,7 +264,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   background: rgba(3,3,5,0.96);
   border: 1px solid var(--accent);
   color: var(--accent);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   padding: 14px 22px;
   border-radius: 8px;
@@ -310,10 +310,10 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div>
-      <div class="top-bar"><div class="brand">OVERLORD // % DIFF</div></div>
+      <div class="top-bar"><div class="brand">OVERLORD // v8.2</div></div>
       <div class="card" style="margin-top:20px">
         <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP HỆ THỐNG</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó • Câu hỏi có quy luật • Chỉ điền đáp án.</p>
+        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó • Đề đa tầng nhiều bước • Chỉ điền đáp án.</p>
         <label>HỌ VÀ TÊN</label>
         <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
         <label>LỚP / SỐ HIỆU</label>
@@ -321,7 +321,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <button class="btn" onclick="loginAction()">TRUY CẬP CHIẾN TRƯỜNG</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Ordered Bank • Answer Only</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Multi-Step Defense • Answer Only</div>
   </div>
 
   <!-- HOME -->
@@ -386,7 +386,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
       </div>
 
       <button class="btn" onclick="openRoom(1)">PHÒNG 1: HACKER TERMINAL (50 CÂU)</button>
-      <button class="btn" onclick="openRoom(2)">PHÒNG 2: ĐỐ MẸO & TƯ DUY (50 CÂU)</button>
+      <button class="btn" onclick="openRoom(2)">PHÒNG 2: TƯ DUY ĐA TẦNG (50 CÂU)</button>
 
       <!-- PVP -->
       <div class="card" style="border-color:var(--danger);padding:12px">
@@ -420,12 +420,13 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div class="q-meta">
           <span id="q-progress">CÂU 1/50</span>
           <span id="q-diff">ĐỘ KHÓ: +10%</span>
+          <span id="q-timer">⏱ 40s</span>
           <span id="q-reward">THƯỞNG: +500 XP</span>
         </div>
         <div id="quiz-question" class="terminal-box"></div>
       </div>
       <label>ĐÁP ÁN CHÍNH XÁC</label>
-      <textarea id="quiz-ans" placeholder="Nhập đáp án..." onpaste="return false" ondrop="return false"></textarea>
+      <textarea id="quiz-ans" placeholder="Nhập đáp án cuối cùng..." onpaste="return false" ondrop="return false"></textarea>
       <button class="btn success" onclick="submitQuiz()">NỘP ĐÁP ÁN</button>
     </div>
     <button class="btn danger" onclick="exitRoomWithPenalty()" style="margin-bottom:6px">THOÁT PHÒNG (RESET 50 CÂU)</button>
@@ -538,17 +539,19 @@ let state = {
   pool2: [],
   idx1: 0,
   idx2: 0,
-  recentSignatures: new Set(),
   redeemedCodes: [],
   hasFiredFireworks: false,
-  pvp: null
+  pvp: null,
+  qTimer: null,
+  qTimeLeft: 40,
+  tabSwitchCount: 0
 };
 
 function createUniqueSeed() {
   return ((Date.now() % 900000) + Math.floor(Math.random() * 900000) + 100000);
 }
 
-// 10k VNĐ = +10% độ khó, cứ tăng thêm 10k tăng thêm +10%
+// 10k VNĐ = +10% độ khó, tăng thêm 10k tăng thêm +10%
 function getDifficultyPercent() {
   return Math.max(10, Math.round((state.rewardVnd / 10000) * 10));
 }
@@ -557,19 +560,38 @@ function getDifficultyMultiplier() {
   return 1 + getDifficultyPercent() / 100;
 }
 
-// CHỐNG CHỤP / COPY / RỜI TAB
-function triggerScreenGuardWarning(reason) {
+// PHÒNG THỦ CHỐNG RỜI TAB / CHỤP MÀN HÌNH / COPY
+function handleAntiCheatViolation(reason) {
   if (!state.name || state.isBanned) return;
   document.body.classList.add('privacy-blur');
-  popup('⚠️ ' + reason);
+  state.tabSwitchCount++;
+  state.cheatCount++;
+
+  if (state.currentRoom > 0) {
+    state.points = Math.max(0, state.points - 250);
+    syncUserData();
+    popup(`⚠️ ${reason} (-250 XP)`);
+    if (state.tabSwitchCount >= 2) {
+      state.tabSwitchCount = 0;
+      setTimeout(() => {
+        advanceQuestion();
+        popup('🔄 Đổi câu hỏi do rời màn hình nhiều lần!');
+      }, 650);
+    }
+  } else {
+    syncUserData();
+    popup(`⚠️ ${reason}`);
+  }
+
   setTimeout(() => {
     document.body.classList.remove('privacy-blur');
-  }, 1400);
+  }, 1500);
 }
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && (state.currentRoom > 0 || state.pvp)) {
     document.body.classList.add('privacy-blur');
+    handleAntiCheatViolation('Phát hiện rời tab/ẩn màn hình');
   } else {
     setTimeout(() => document.body.classList.remove('privacy-blur'), 350);
   }
@@ -582,7 +604,7 @@ window.addEventListener('blur', () => {
 });
 
 window.addEventListener('focus', () => {
-  setTimeout(() => document.body.classList.remove('privacy-blur'), 300);
+  setTimeout(() => document.body.classList.remove('privacy-blur'), 350);
 });
 
 document.addEventListener('contextmenu', (e) => {
@@ -594,7 +616,7 @@ document.addEventListener('contextmenu', (e) => {
 document.addEventListener('copy', (e) => {
   if (e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
     e.preventDefault();
-    triggerScreenGuardWarning('Cấm sao chép nội dung đề!');
+    handleAntiCheatViolation('Cấm sao chép nội dung');
   }
 });
 
@@ -605,7 +627,7 @@ document.addEventListener('keydown', (e) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText('SCREENSHOT_BLOCKED').catch(() => {});
     }
-    triggerScreenGuardWarning('Phát hiện thao tác chụp màn hình!');
+    handleAntiCheatViolation('Chặn thao tác chụp màn hình');
     return;
   }
   if (
@@ -616,7 +638,7 @@ document.addEventListener('keydown', (e) => {
   ) {
     if (!(e.ctrlKey && key === 'c' && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT'))) {
       e.preventDefault();
-      triggerScreenGuardWarning('Thao tác bị hạn chế bởi hệ thống!');
+      handleAntiCheatViolation('Thao tác bị khóa');
     }
   }
 });
@@ -686,258 +708,244 @@ function syncUserData() {
   });
 }
 
-// PHÒNG 1: 50 CÂU SẮP XẾP THEO CHU KỲ 5 DẠNG CÓ QUY LUẬT
-// Dạng 1: Biểu thức & toán tử | Dạng 2: Tổng dãy | Dạng 3: Hệ cơ số | Dạng 4: Chỉ số mảng | Dạng 5: Chia nguyên & dư
+// PHÒNG 1: 50 CÂU NHIỀU BƯỚC BIẾN ĐỔI + RÀNG BUỘC ĐIỀU KIỆN (KHÓ ĐOÁN HƠN ĐỀ CƠ BẢN)
 function generate50HackerQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
-  const s = (seed % 997) + 19;
-  const pts = Math.round(450 * mult);
+  const s = (seed % 997) + 31;
+  const pts = Math.round(550 * mult);
   const scale = Math.max(1, Math.round(mult * 10));
   const items = [];
 
   for (let i = 1; i <= 50; i++) {
     const type = ((i - 1) % 5) + 1;
-    const roundInType = Math.ceil(i / 5);
-    const v1 = ((i * 7 + s) % 9) + 2;
-    const v2 = ((i * 11 + s) % 7) + 2;
+    const round = Math.ceil(i / 5);
+    const a = (((i * 7 + s) % 9) + 3) * scale;
+    const b = (((i * 11 + s) % 7) + 2) * scale;
+    const m = ((i + round) % 4) + 3;
 
     if (type === 1) {
-      const a = v1 * scale;
-      const b = v2 * scale;
-      const c = roundInType * scale;
-      const val = pct >= 30 ? (a + b) * 2 - c : a * 2 + b;
-      const expr = pct >= 30 ? `(a + b) * 2 - ${c}` : `a * 2 + ${b}`;
+      // Chuỗi 3 bước biến đổi có điều kiện chẵn/lẻ
+      let val = a;
+      val = val * 2 + b;
+      val = (val % m === 0) ? (val / m + round * scale) : (val - (val % m) + m);
       items.push({
-        id: `H-T1-${i}`,
+        id: `H1-${i}`,
         pct,
-        q: `[#${i}/50 • Dạng 1: Biểu thức • +${pct}%]\nCho a = ${a}, b = ${b}.\nTính giá trị: ${expr}`,
+        q: `[#${i}/50 • Chuỗi trạng thái • +${pct}%]\nKhởi tạo st = ${a}, mod = ${m}.\n1) st = st * 2 + ${b}\n2) Nếu st % mod == 0 thì st = st / mod + ${round * scale}; ngược lại st = st - (st % mod) + mod.\nGiá trị cuối của st là bao nhiêu?`,
         ans: [String(val)],
         pts
       });
     } else if (type === 2) {
-      const n = Math.min(30, v1 + 3 + roundInType + Math.floor(pct / 20));
-      const sum = (n * (n + 1)) / 2;
+      // Tổng có điều kiện lọc bội số
+      const n = Math.min(28, 8 + round * 2 + Math.floor(pct / 20));
+      const k = ((i % 3) + 2);
+      let sum = 0;
+      for (let x = 1; x <= n; x++) {
+        if (x % k !== 0) sum += x;
+      }
       items.push({
-        id: `H-T2-${i}`,
+        id: `H2-${i}`,
         pct,
-        q: `[#${i}/50 • Dạng 2: Tổng dãy • +${pct}%]\nTính tổng các số nguyên từ 1 đến ${n}.`,
+        q: `[#${i}/50 • Lọc bội số • +${pct}%]\nDuyệt các số nguyên từ 1 đến ${n}.\nBỏ qua mọi số chia hết cho ${k}, cộng dồn các số còn lại.\nTổng nhận được là bao nhiêu?`,
         ans: [String(sum)],
         pts
       });
     } else if (type === 3) {
-      const dec = (v1 + v2 + roundInType * 2) * Math.max(1, Math.floor(mult));
-      if (pct >= 40 && i % 2 === 0) {
-        items.push({
-          id: `H-T3-${i}`,
-          pct,
-          q: `[#${i}/50 • Dạng 3: Hệ HEX • +${pct}%]\nĐổi số thập phân ${dec} sang hệ 16 (HEX, viết hoa).`,
-          ans: [dec.toString(16).toUpperCase(), dec.toString(16).toLowerCase()],
-          pts
-        });
-      } else {
-        items.push({
-          id: `H-T3-${i}`,
-          pct,
-          q: `[#${i}/50 • Dạng 3: Nhị phân • +${pct}%]\nĐổi số thập phân ${dec} sang hệ nhị phân (binary).`,
-          ans: [dec.toString(2)],
-          pts
-        });
-      }
-    } else if (type === 4) {
-      const size = 6 + v2 + Math.floor(pct / 20);
-      const stt = ((i + v1) % size) + 1;
+      // Mã hóa dịch vòng + nhân hệ số
+      const baseNum = ((i * 5 + s) % 19) + 11;
+      const shifted = ((baseNum * 3 + round) % 97) + 13;
+      const ans = shifted - (baseNum % 5);
       items.push({
-        id: `H-T4-${i}`,
+        id: `H3-${i}`,
         pct,
-        q: `[#${i}/50 • Dạng 4: Mảng • +${pct}%]\nMảng gồm ${size} phần tử đánh số từ 0.\nChỉ số (index) của phần tử thứ ${stt} là mấy?`,
-        ans: [String(stt - 1)],
+        q: `[#${i}/50 • Biến đổi mã • +${pct}%]\nCho key = ${baseNum}.\nĐặt temp = ((key * 3 + ${round}) % 97) + 13.\nKết quả của (temp - (key % 5)) bằng bao nhiêu?`,
+        ans: [String(ans)],
+        pts
+      });
+    } else if (type === 4) {
+      // Truy cập chỉ số sau khi đảo chiều/dịch chuyển
+      const len = 7 + (i % 6) + Math.floor(pct / 25);
+      const shift = (round + (i % 4)) % len;
+      const targetIdx = (i + round * 2) % len;
+      const originalIdx = (targetIdx + shift) % len;
+      items.push({
+        id: `H4-${i}`,
+        pct,
+        q: `[#${i}/50 • Dịch vòng mảng • +${pct}%]\nMảng dài ${len} phần tử (index 0..${len - 1}) bị dịch trái ${shift} vị trí (phần tử đầu chuyển ra cuối).\nPhần tử nằm ở index ${targetIdx} sau khi dịch vốn ở index bao nhiêu ban đầu?`,
+        ans: [String(originalIdx)],
         pts
       });
     } else {
-      const div = ((i % 4) + 2) + Math.floor(pct / 30);
-      const num = (v1 * 10 + v2) * Math.max(1, Math.floor(mult));
-      if (i % 2 === 0) {
-        items.push({
-          id: `H-T5-${i}`,
-          pct,
-          q: `[#${i}/50 • Dạng 5: Chia dư • +${pct}%]\nTính kết quả của ${num} % ${div}.`,
-          ans: [String(num % div)],
-          pts
-        });
-      } else {
-        items.push({
-          id: `H-T5-${i}`,
-          pct,
-          q: `[#${i}/50 • Dạng 5: Chia nguyên • +${pct}%]\nTính phần nguyên của ${num} / ${div}.`,
-          ans: [String(Math.floor(num / div))],
-          pts
-        });
-      }
+      // Hệ số nhân lũy tiến nhiều tầng
+      const x0 = ((i * 3 + s) % 6) + 2;
+      const stepAdd = round + Math.floor(pct / 25);
+      const ans = (x0 + stepAdd) * (x0 + stepAdd * 2) - m;
+      items.push({
+        id: `H5-${i}`,
+        pct,
+        q: `[#${i}/50 • Đa tầng • +${pct}%]\nCho p = ${x0}, d = ${stepAdd}, sub = ${m}.\nTính ((p + d) * (p + 2 * d)) - sub.`,
+        ans: [String(ans)],
+        pts
+      });
     }
   }
   return items;
 }
 
-// PHÒNG 2: 50 CÂU SẮP XẾP THEO 10 CHỦ ĐỀ CÓ QUY LUẬT (MỖI CHỦ ĐỀ 5 CÂU)
+// PHÒNG 2: 50 CÂU TƯ DUY ĐA TẦNG / TÌNH HUỐNG NHIỀU RÀNG BUỘC (KHÓ ĐOÁN KHI HỎI MỒM)
 function generate50RiddleQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
-  const s = (seed % 991) + 23;
-  const pts = Math.round(500 * mult);
+  const s = (seed % 991) + 37;
+  const pts = Math.round(600 * mult);
   const step = Math.max(1, Math.floor(pct / 10));
   const items = [];
 
-  const topic1Language = [
-    { q: "Cái gì thuộc về bạn nhưng người khác lại dùng nhiều hơn bạn?", ans: ["ten", "ten cua ban"] },
-    { q: "Tháng nào trong năm có 28 ngày?", ans: ["tat ca cac thang", "moi thang", "thang nao cung co"] },
-    { q: "Cái gì càng cắt càng dài ra?", ans: ["cai ao", "ao", "con muong", "duong ham"] },
-    { q: "Cái gì luôn đi tới nhưng không bao giờ tới nơi?", ans: ["ngay mai", "tuong lai"] },
-    { q: "Từ nào trong tiếng Việt để nguyên thì dài nhưng thêm dấu sắc lại ngắn?", ans: ["dai", "chu dai"] }
-  ];
-
-  const topic2Situation = [
-    { q: "Chọn phòng an toàn nhất: 1 - Phòng lửa cháy lớn, 2 - Phòng sát thủ cầm súng, 3 - Phòng sư tử bị bỏ đói 3 năm.", ans: ["phong 3", "3", "so 3"] },
-    { q: "Một người chạy đua vượt qua người đang đứng thứ 2. Người đó đang ở vị trí thứ mấy?", ans: ["thu 2", "2", "so 2"] },
-    { q: "Có 10 con chim đậu trên cành, thợ săn bắn rụng 1 con. Trên cành còn lại bao nhiêu con?", ans: ["0", "khong con nao", "het"] },
-    { q: "Người đàn ông đẩy xe nhỏ tới khách sạn và biết mình phá sản. Anh ta đang chơi trò gì?", ans: ["co ty phu", "choi co ty phu"] },
-    { q: "Có 3 bóng đèn trong phòng kín và 3 công tắc ở ngoài. Vào phòng 1 lần duy nhất để biết đèn nào dùng công tắc nào bằng cách nào?", ans: ["bat 1 cai lau roi tat", "so do am bong den", "kiem tra do nong"] }
-  ];
-
   for (let i = 1; i <= 50; i++) {
-    const topic = Math.floor((i - 1) / 5) + 1; // 1..10
-    const idxInTopic = (i - 1) % 5; // 0..4
-    const baseA = (((i * 3 + s) % 8) + 2) * step;
-    const baseB = (((i * 5 + s) % 7) + 2) * step;
+    const topic = Math.floor((i - 1) / 5) + 1;
+    const k = (i - 1) % 5;
+    const u = (((i * 4 + s) % 8) + 2) * step;
+    const v = (((i * 6 + s) % 7) + 2) * step;
 
     if (topic === 1) {
-      const r = topic1Language[(idxInTopic + s) % topic1Language.length];
-      items.push({ id: `C1-${i}`, pct, q: `[#${i}/50 • Chủ đề 1: Đố mẹo ngôn ngữ • +${pct}%]\n${r.q}`, ans: r.ans, pts });
-    } else if (topic === 2) {
-      const r = topic2Situation[(idxInTopic + s) % topic2Situation.length];
-      items.push({ id: `C2-${i}`, pct, q: `[#${i}/50 • Chủ đề 2: Tình huống logic • +${pct}%]\n${r.q}`, ans: r.ans, pts });
-    } else if (topic === 3) {
-      // Dãy số có quy luật tăng dần
-      const d = baseB;
-      const start = baseA;
-      const term = start + d * (idxInTopic + 2);
+      // Quy tắc ánh xạ ký tự/số tự định nghĩa trong đề
+      const codeChar = ['A', 'B', 'C', 'D', 'E'][(i + s) % 5];
+      const base = u + v;
+      const val = base * 2 + (k + 1) * step;
       items.push({
-        id: `C3-${i}`,
+        id: `M1-${i}`,
         pct,
-        q: `[#${i}/50 • Chủ đề 3: Quy luật dãy số • +${pct}%]\nDãy số: ${start}, ${start + d}, ${start + d * 2}, ...\nSố ở vị trí thứ ${idxInTopic + 3} là bao nhiêu?`,
-        ans: [String(term)],
+        q: `[#${i}/50 • Quy tắc ẩn • +${pct}%]\nTrong hệ quy ước riêng:\nMỗi lần gặp '${codeChar}' thì cộng thêm ${base}, sau đó nhân 2 rồi cộng thêm ${(k + 1) * step}.\nVới 1 lần '${codeChar}' xuất hiện, giá trị thu được là bao nhiêu?`,
+        ans: [String(val)],
+        pts
+      });
+    } else if (topic === 2) {
+      // Bài toán ràng buộc 2 điều kiện số học
+      const x = u + 3;
+      const y = v + 2;
+      const ans = x * 3 + y * 2 - step;
+      items.push({
+        id: `M2-${i}`,
+        pct,
+        q: `[#${i}/50 • Ràng buộc kép • +${pct}%]\nCó hai biến X = ${x} và Y = ${y}.\nTính giá trị của (3*X + 2*Y) sau khi khấu trừ ${step} đơn vị.`,
+        ans: [String(ans)],
+        pts
+      });
+    } else if (topic === 3) {
+      // Quy luật dãy số nhân + cộng lệch
+      const start = u;
+      const mul = 2;
+      const add = v;
+      const n1 = start * mul + add;
+      const n2 = n1 * mul + add;
+      const n3 = n2 * mul + add;
+      items.push({
+        id: `M3-${i}`,
+        pct,
+        q: `[#${i}/50 • Chuỗi phi tuyến • +${pct}%]\nSố đầu tiên là ${start}. Mỗi số tiếp theo bằng (số trước * ${mul} + ${add}).\nSố thứ 3 trong chuỗi là bao nhiêu?`,
+        ans: [String(n3)],
         pts
       });
     } else if (topic === 4) {
-      // Thời gian & khoảng cách
-      if (idxInTopic === 0) {
-        const mins = (idxInTopic + 2) * 15 * step;
-        items.push({
-          id: `C4-${i}`,
-          pct,
-          q: `[#${i}/50 • Chủ đề 4: Thời gian • +${pct}%]\nCó 3 viên thuốc, uống mỗi viên cách nhau ${mins} phút. Uống hết cả 3 viên mất bao nhiêu phút?`,
-          ans: [String(mins * 2)],
-          pts
-        });
-      } else {
-        const h1 = ((baseA % 10) + 1);
-        const addH = baseB;
-        const outH = ((h1 + addH - 1) % 12) + 1;
-        items.push({
-          id: `C4-${i}`,
-          pct,
-          q: `[#${i}/50 • Chủ đề 4: Đồng hồ 12h • +${pct}%]\nKim giờ đang chỉ ${h1} giờ. Sau ${addH} giờ nữa kim giờ chỉ số mấy (hệ 12 giờ)?`,
-          ans: [String(outH)],
-          pts
-        });
-      }
-    } else if (topic === 5) {
-      // Hình học & không gian
-      const w = baseA + 2;
-      const l = baseB + 4;
-      if (idxInTopic % 2 === 0) {
-        items.push({
-          id: `C5-${i}`,
-          pct,
-          q: `[#${i}/50 • Chủ đề 5: Hình học • +${pct}%]\nHình chữ nhật có chiều dài ${l} và chiều rộng ${w}. Chu vi hình chữ nhật là bao nhiêu?`,
-          ans: [String((l + w) * 2)],
-          pts
-        });
-      } else {
-        items.push({
-          id: `C5-${i}`,
-          pct,
-          q: `[#${i}/50 • Chủ đề 5: Hình học • +${pct}%]\nHình vuông có cạnh bằng ${w}. Diện tích hình vuông là bao nhiêu?`,
-          ans: [String(w * w)],
-          pts
-        });
-      }
-    } else if (topic === 6) {
-      // Chia phần & cân đong
-      const totalItems = (baseA + baseB) * 3;
-      const parts = 3 + (idxInTopic % 3);
-      const each = Math.floor(totalItems / parts);
+      // Thời gian lệch múi + chênh lệch hành trình
+      const minPerHop = (k + 2) * 10 * step;
+      const stops = (k % 3) + 3;
+      const rest = (k + 1) * 5 * step;
+      const total = stops * minPerHop + (stops - 1) * rest;
       items.push({
-        id: `C6-${i}`,
+        id: `M4-${i}`,
         pct,
-        q: `[#${i}/50 • Chủ đề 6: Chia đều • +${pct}%]\nChia đều ${each * parts} phần quà cho ${parts} nhóm. Mỗi nhóm nhận được bao nhiêu phần?`,
-        ans: [String(each)],
+        q: `[#${i}/50 • Lịch trình • +${pct}%]\nMột chuyến đi gồm ${stops} chặng, mỗi chặng mất ${minPerHop} phút.\nGiữa 2 chặng liền kề nghỉ ${rest} phút.\nTổng thời gian từ đầu đến cuối là bao nhiêu phút?`,
+        ans: [String(total)],
+        pts
+      });
+    } else if (topic === 5) {
+      // Hình khối / ghép cắt phần
+      const side = u + 3;
+      const cut = Math.min(side - 1, (k % 2) + 1);
+      const areaRemain = side * side - cut * cut;
+      items.push({
+        id: `M5-${i}`,
+        pct,
+        q: `[#${i}/50 • Cắt ghép • +${pct}%]\nMột tấm bìa vuông cạnh ${side} bị khoét mất một ô vuông nhỏ cạnh ${cut}.\nDiện tích phần bìa còn lại là bao nhiêu?`,
+        ans: [String(areaRemain)],
+        pts
+      });
+    } else if (topic === 6) {
+      // Chia phần có dư / chênh lệch
+      const perGroup = u + 4;
+      const groups = (k % 3) + 3;
+      const extra = v;
+      const total = perGroup * groups + extra;
+      items.push({
+        id: `M6-${i}`,
+        pct,
+        q: `[#${i}/50 • Phân bổ • +${pct}%]\nCó ${groups} tổ, mỗi tổ được cấp ${perGroup} phần, và còn dư thêm ${extra} phần dự phòng.\nTổng số phần đã cấp và dự phòng là bao nhiêu?`,
+        ans: [String(total)],
         pts
       });
     } else if (topic === 7) {
-      // Suy luận tổng & hiệu
-      const big = baseA + baseB + 10;
-      const small = baseA;
+      // Suy luận tổng hiệu mở rộng
+      const a = u + v + 6;
+      const b = u + 1;
+      const ans = (a + b) * 2 - a;
       items.push({
-        id: `C7-${i}`,
+        id: `M7-${i}`,
         pct,
-        q: `[#${i}/50 • Chủ đề 7: Suy luận số • +${pct}%]\nTổng hai số là ${big}, số bé là ${small}. Số lớn là bao nhiêu?`,
-        ans: [String(big - small)],
+        q: `[#${i}/50 • Suy luận số • +${pct}%]\nCho tổng hai số là ${a + b}, số nhỏ là ${b}.\nLấy tổng đó nhân 2 rồi trừ đi số lớn, kết quả là bao nhiêu?`,
+        ans: [String(ans)],
         pts
       });
     } else if (topic === 8) {
-      // Năng suất & quãng đường
-      const v = (idxInTopic + 2) * 10 * step;
-      const t = (idxInTopic + 2);
+      // Chuyển động hai giai đoạn
+      const v1 = (k + 2) * 15 * step;
+      const t1 = 2;
+      const v2 = (k + 3) * 10 * step;
+      const t2 = 3;
+      const dist = v1 * t1 + v2 * t2;
       items.push({
-        id: `C8-${i}`,
+        id: `M8-${i}`,
         pct,
-        q: `[#${i}/50 • Chủ đề 8: Chuyển động • +${pct}%]\nMột xe chạy đều với vận tốc ${v} km/h trong ${t} giờ. Quãng đường đi được là bao nhiêu km?`,
-        ans: [String(v * t)],
+        q: `[#${i}/50 • Hai giai đoạn • +${pct}%]\nGiai đoạn 1 đi ${v1} km/h trong ${t1} giờ.\nGiai đoạn 2 đi ${v2} km/h trong ${t2} giờ.\nTổng quãng đường đi được là bao nhiêu km?`,
+        ans: [String(dist)],
         pts
       });
     } else if (topic === 9) {
-      // Mật mã phép tính ngược
-      const k = baseA + 2;
-      const m = baseB + 1;
-      const res = k * m - step;
+      // Giải ngược 3 phép tính liên tiếp
+      const origin = u + 5;
+      const mul = (k % 3) + 2;
+      const add = v + 2;
+      const sub = step + 1;
+      const after = origin * mul + add - sub;
       items.push({
-        id: `C9-${i}`,
+        id: `M9-${i}`,
         pct,
-        q: `[#${i}/50 • Chủ đề 9: Giải ngược • +${pct}%]\nLấy một số nhân với ${m} rồi trừ đi ${step} thì được ${res}. Số ban đầu là bao nhiêu?`,
-        ans: [String(k)],
+        q: `[#${i}/50 • Giải ngược • +${pct}%]\nSố ban đầu nhân ${mul}, cộng ${add}, trừ ${sub} được kết quả là ${after}.\nSố ban đầu là bao nhiêu?`,
+        ans: [String(origin)],
         pts
       });
     } else {
-      // Chủ đề 10: Tổng hợp (chỉ câu 46 có 1 bài tuổi, các câu còn lại là bài tư duy khác)
-      if (idxInTopic === 0) {
-        const child = 6 * step;
-        const father = child * 3;
+      // Chủ đề 10: Tổng hợp (chỉ câu 46 có 1 bài tuổi, còn lại là bài khác)
+      if (k === 0) {
+        const child = 5 * step;
+        const father = child * 4;
         items.push({
-          id: `C10-${i}`,
+          id: `M10-${i}`,
           pct,
-          q: `[#${i}/50 • Chủ đề 10: Tổng hợp • +${pct}%]\nTuổi bố gấp 3 lần tuổi con. Tổng tuổi hai bố con hiện nay là ${child + father}. Tuổi bố hiện nay là bao nhiêu?`,
-          ans: [String(father)],
+          q: `[#${i}/50 • Tổng hợp • +${pct}%]\nTuổi bố gấp 4 lần tuổi con. Tổng tuổi hai bố con hiện nay là ${child + father}.\nHỏi sau ${step} năm nữa tuổi bố là bao nhiêu?`,
+          ans: [String(father + step)],
           pts
         });
       } else {
-        const a = baseA + idxInTopic;
-        const b = baseB + idxInTopic;
+        const p = u + k + 2;
+        const qNum = v + k + 1;
+        const ans = (p + qNum) * (p - qNum);
         items.push({
-          id: `C10-${i}`,
+          id: `M10-${i}`,
           pct,
-          q: `[#${i}/50 • Chủ đề 10: Tổng hợp • +${pct}%]\nTính giá trị của ${a} * ${a} - ${b} * ${b} khi a = ${a}, b = ${b}.`,
-          ans: [String(a * a - b * b)],
+          q: `[#${i}/50 • Tổng hợp • +${pct}%]\nCho P = ${p} và Q = ${qNum}.\nTính giá trị của (P + Q) * (P - Q).`,
+          ans: [String(ans)],
           pts
         });
       }
@@ -1003,14 +1011,14 @@ function normalizeStr(s) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/[^a-z0-9\s-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function initWatermark(name, cls) {
   let html = '';
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < 28; i++) {
     html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}]</span>`;
   }
   document.getElementById('watermark-layer').innerHTML = html;
@@ -1028,6 +1036,30 @@ function popup(txt) {
   setTimeout(() => el.classList.remove('show'), 1800);
 }
 
+function stopQuestionTimer() {
+  if (state.qTimer) {
+    clearInterval(state.qTimer);
+    state.qTimer = null;
+  }
+}
+
+function startQuestionTimer() {
+  stopQuestionTimer();
+  state.qTimeLeft = 40;
+  document.getElementById('q-timer').textContent = `⏱ ${state.qTimeLeft}s`;
+  state.qTimer = setInterval(() => {
+    state.qTimeLeft--;
+    document.getElementById('q-timer').textContent = `⏱ ${Math.max(0, state.qTimeLeft)}s`;
+    if (state.qTimeLeft <= 0) {
+      stopQuestionTimer();
+      state.points = Math.max(0, state.points - 200);
+      syncUserData();
+      popup('⏰ Hết giờ làm câu này (-200 XP)');
+      advanceQuestion();
+    }
+  }, 1000);
+}
+
 function loginAction() {
   let name = document.getElementById('in-name').value.trim();
   let cls = document.getElementById('in-class').value.trim();
@@ -1040,11 +1072,11 @@ function loginAction() {
 
   state.name = name;
   state.classId = cls;
-  state.recentSignatures.clear();
+  state.tabSwitchCount = 0;
 
   const seed = createUniqueSeed();
   state.pool1 = generate50HackerQuestions(seed);
-  state.pool2 = generate50RiddleQuestions(seed + 137);
+  state.pool2 = generate50RiddleQuestions(seed + 193);
   state.idx1 = 0;
   state.idx2 = 0;
 
@@ -1069,6 +1101,7 @@ function loginAction() {
 }
 
 function logoutAction() {
+  stopQuestionTimer();
   state.name = '';
   state.currentRoom = 0;
   showScreen('screen-login');
@@ -1165,6 +1198,7 @@ function redeemCode() {
 function openRoom(roomId) {
   if (state.isBanned) return;
   state.currentRoom = roomId;
+  state.tabSwitchCount = 0;
   const seed = createUniqueSeed();
   if (roomId === 1) {
     state.pool1 = generate50HackerQuestions(seed);
@@ -1173,9 +1207,10 @@ function openRoom(roomId) {
     state.pool2 = generate50RiddleQuestions(seed);
     state.idx2 = 0;
   }
-  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'ĐỐ MẸO & TƯ DUY';
+  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'TƯ DUY ĐA TẦNG';
   renderCurrentQuestion();
   showScreen('screen-quiz');
+  startQuestionTimer();
 }
 
 function renderCurrentQuestion() {
@@ -1204,6 +1239,7 @@ function renderCurrentQuestion() {
   document.getElementById('q-reward').textContent = `THƯỞNG: +${qObj.pts} XP`;
   document.getElementById('quiz-question').textContent = qObj.q;
   document.getElementById('quiz-ans').value = '';
+  if (state.currentRoom > 0) startQuestionTimer();
 }
 
 function advanceQuestion() {
@@ -1216,11 +1252,7 @@ function evaluateAnswerOnly(ansRaw, qObj) {
   const a = normalizeStr(ansRaw);
   if (!a) return { ok: false, reason: 'Chưa nhập đáp án!' };
 
-  const matchAns = qObj.ans.some(k => {
-    const nk = normalizeStr(k);
-    return a === nk || (nk.length >= 4 && a.includes(nk));
-  });
-
+  const matchAns = qObj.ans.some(k => a === normalizeStr(k));
   if (!matchAns) return { ok: false, reason: 'Đáp án chưa chính xác!' };
   return { ok: true, pts: qObj.pts };
 }
@@ -1234,6 +1266,7 @@ function submitQuiz() {
   const res = evaluateAnswerOnly(ans, qObj);
 
   if (res.ok) {
+    stopQuestionTimer();
     state.points += res.pts;
     popup(`CHUẨN XÁC! +${res.pts} XP`);
     syncUserData();
@@ -1247,6 +1280,7 @@ function submitQuiz() {
 
 function exitRoomWithPenalty() {
   if (confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
+    stopQuestionTimer();
     const seed = createUniqueSeed();
     if (state.currentRoom === 1) {
       state.pool1 = generate50HackerQuestions(seed);
@@ -1395,7 +1429,10 @@ function cancelPvpRoom() {
   }
 }
 
-function goHome() { showScreen('screen-home'); }
+function goHome() {
+  stopQuestionTimer();
+  showScreen('screen-home');
+}
 
 function openVoucher() {
   document.getElementById('v-name').textContent = state.name.toUpperCase() + ' (' + state.classId + ')';
