@@ -3,22 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // HARDENED DEFENSE v8.2</title>
+<title>Thử Thách Logic & Tính Toán</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
 :root {
-  --bg: #030305;
-  --panel: #090910;
-  --panel-border: #1a1a2e;
-  --accent: #ffb700;
-  --accent-glow: rgba(255, 183, 0, 0.35);
-  --danger: #ff003c;
-  --danger-glow: rgba(255, 0, 60, 0.4);
-  --success: #00f0ff;
-  --success-glow: rgba(0, 240, 255, 0.35);
-  --text: #f0f0f5;
-  --text-dim: #707085;
+  --bg: #0c0e14;
+  --panel: #131722;
+  --panel-2: #181d2b;
+  --border: #252c3d;
+  --accent: #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --danger: #f43f5e;
+  --ok: #22c55e;
+  --text: #e5e7eb;
+  --muted: #8b93a7;
 }
 
 * {
@@ -33,28 +32,17 @@
 }
 
 html, body {
-  height: 100%;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Courier New', monospace, -apple-system;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
+  line-height: 1.45;
 }
 
 body.privacy-blur #app {
-  filter: blur(22px) brightness(0.18);
-  transition: filter 0.06s linear;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
-              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  background-size: 100% 3px, 3px 100%;
-  pointer-events: none;
-  z-index: 999;
+  filter: blur(20px) brightness(0.25);
+  transition: filter 0.08s linear;
 }
 
 #watermark-layer {
@@ -65,19 +53,19 @@ body::before {
   pointer-events: none;
   z-index: 998;
   overflow: hidden;
-  opacity: 0.09;
+  opacity: 0.05;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   align-content: space-around;
   font-size: 13px;
-  font-weight: 800;
-  color: var(--accent);
-  transform: rotate(-22deg);
+  font-weight: 600;
+  color: var(--text);
+  transform: rotate(-18deg);
 }
 
 #watermark-layer span {
-  padding: 18px 24px;
+  padding: 20px 26px;
 }
 
 #fireworks-canvas {
@@ -94,7 +82,7 @@ body::before {
   z-index: 2;
   min-height: 100dvh;
   padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
-  max-width: 480px;
+  max-width: 460px;
   margin: 0 auto;
 }
 
@@ -103,181 +91,208 @@ body::before {
   min-height: 100dvh;
   flex-direction: column;
   justify-content: space-between;
+  padding-bottom: 12px;
 }
 .screen.active {
   display: flex !important;
-  animation: panelIn 0.2s ease;
-}
-
-@keyframes panelIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
 }
 
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--panel-border);
-  margin-bottom: 14px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
 }
 .brand {
-  color: var(--accent);
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px var(--accent-glow);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: -0.2px;
 }
-.user-badge {
-  background: rgba(255,183,0,0.1);
-  border: 1px solid var(--accent);
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
+.pill {
+  background: var(--accent-soft);
+  border: 1px solid rgba(56, 189, 248, 0.35);
   color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .card {
   background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
   padding: 14px;
-  margin: 8px 0;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  margin-bottom: 10px;
 }
-.card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 3px;
-  height: 100%;
-  background: var(--accent);
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .btn {
   display: block;
   width: 100%;
-  min-height: 46px;
-  background: linear-gradient(135deg, #221b00, #110d00);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: 6px;
-  margin: 8px 0;
+  min-height: 44px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 8px;
+  margin: 7px 0;
   cursor: pointer;
-  letter-spacing: 1px;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.08s;
 }
-.btn:active { transform: scale(0.97); background: var(--accent); color: #000; }
+.btn:active { transform: scale(0.99); }
+
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #081018;
+}
+
+.btn.outline-accent {
+  background: var(--accent-soft);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: var(--accent);
+}
+
 .btn.danger {
-  border-color: var(--danger);
-  color: var(--danger);
-  background: linear-gradient(135deg, #2b000a, #140003);
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.45);
+  color: #fda4af;
 }
-.btn.danger:active { background: var(--danger); color: #fff; }
-.btn.success {
-  border-color: var(--success);
-  color: var(--success);
-  background: linear-gradient(135deg, #002b2b, #001414);
+
+.btn.ok {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.45);
+  color: #86efac;
 }
-.btn.success:active { background: var(--success); color: #000; }
 
 input, textarea, select {
   width: 100%;
-  background: #050508;
-  border: 1px solid var(--panel-border);
+  background: var(--bg);
+  border: 1px solid var(--border);
   color: var(--text);
-  font-size: 16px !important;
-  padding: 11px;
-  border-radius: 6px;
-  margin: 5px 0 9px;
+  font-size: 15px !important;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 5px 0 10px;
   outline: none;
   font-family: inherit;
   user-select: text !important;
   -webkit-user-select: text !important;
 }
-input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-textarea { min-height: 70px; resize: none; }
-label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing: 1px; text-transform: uppercase; }
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+}
+textarea {
+  min-height: 68px;
+  resize: none;
+}
+label {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
 
-.terminal-box {
-  background: #020204;
-  border: 1px solid #1f241a;
-  border-radius: 6px;
-  padding: 14px;
-  font-size: 13px;
+.q-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px;
+  font-size: 14px;
   line-height: 1.55;
-  color: var(--success);
+  color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
 }
+
 .q-meta {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  color: var(--accent);
+  font-size: 12px;
+  color: var(--muted);
   margin-bottom: 8px;
-  border-bottom: 1px dashed #222;
-  padding-bottom: 6px;
   gap: 6px;
   flex-wrap: wrap;
 }
+.q-meta b {
+  color: var(--accent);
+  font-weight: 600;
+}
 
-.leaderboard-table {
+.table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
-  margin-top: 6px;
+  font-size: 12.5px;
 }
-.leaderboard-table th, .leaderboard-table td {
-  border: 1px solid var(--panel-border);
-  padding: 6px;
+.table th, .table td {
+  border-bottom: 1px solid var(--border);
+  padding: 7px 6px;
   text-align: left;
 }
-.leaderboard-table th { background: #12121c; color: var(--accent); }
+.table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 11.5px;
+}
 
 .timer-display {
-  font-size: 34px;
+  font-size: 28px;
   color: var(--danger);
   text-align: center;
-  font-weight: 800;
-  margin-bottom: 8px;
+  font-weight: 700;
+  margin: 4px 0 8px;
 }
 .room-code-display {
-  font-size: 28px;
-  letter-spacing: 6px;
+  font-size: 26px;
+  letter-spacing: 5px;
   color: var(--accent);
   text-align: center;
-  font-weight: 800;
+  font-weight: 700;
   margin: 10px 0;
 }
 
 .popup-notify {
   position: fixed;
-  top: 35%;
+  top: 32%;
   left: 50%;
-  transform: translate(-50%,-50%) scale(0.8);
-  background: rgba(3,3,5,0.96);
+  transform: translate(-50%, -50%) scale(0.92);
+  background: var(--panel);
   border: 1px solid var(--accent);
-  color: var(--accent);
-  font-size: 14px;
-  font-weight: 800;
-  padding: 14px 22px;
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 12px 18px;
   border-radius: 8px;
   opacity: 0;
   pointer-events: none;
   z-index: 10000;
-  transition: all 0.25s;
+  transition: all 0.2s ease;
   text-align: center;
-  max-width: 90%;
+  max-width: 88%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
-.popup-notify.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+.popup-notify.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
 
-.alert-overlay, .banned-overlay {
+.banned-overlay {
   position: fixed;
   inset: 0;
   display: none;
@@ -287,16 +302,29 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   z-index: 9999;
   text-align: center;
   padding: 24px;
+  background: #1a090d;
+  color: #fda4af;
 }
-.alert-overlay { background: rgba(0,0,0,0.95); }
-.alert-overlay.show { display: flex; }
-.banned-overlay { background: #260007; color: var(--danger); }
 .banned-overlay.show { display: flex; }
 
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+}
+
+.progress-track {
+  background: var(--bg);
+  height: 7px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.progress-fill {
+  background: var(--accent);
+  width: 0%;
+  height: 100%;
+  transition: width 0.25s ease;
 }
 </style>
 </head>
@@ -310,208 +338,209 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div>
-      <div class="top-bar"><div class="brand">OVERLORD // v8.2</div></div>
-      <div class="card" style="margin-top:20px">
-        <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP HỆ THỐNG</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó • Đề đa tầng nhiều bước • Chỉ điền đáp án.</p>
-        <label>HỌ VÀ TÊN</label>
-        <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
-        <label>LỚP / SỐ HIỆU</label>
-        <input id="in-class" type="text" placeholder="9A1" maxlength="20" autocomplete="off">
-        <button class="btn" onclick="loginAction()">TRUY CẬP CHIẾN TRƯỜNG</button>
+      <div class="top-bar">
+        <div class="brand">Thử Thách Logic</div>
+        <span class="sub">v8.3</span>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title" style="font-size:16px">Đăng nhập</div>
+        <p class="sub" style="margin-bottom:14px">10.000đ = +10% độ khó. Chỉ nhập đáp án cuối cùng.</p>
+        <label>Họ và tên</label>
+        <input id="in-name" type="text" placeholder="Ví dụ: Minh Khôi" maxlength="40" autocomplete="off">
+        <label>Lớp</label>
+        <input id="in-class" type="text" placeholder="Ví dụ: 9A2" maxlength="20" autocomplete="off">
+        <button class="btn primary" onclick="loginAction()">Vào làm bài</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Multi-Step Defense • Answer Only</div>
+    <div class="sub" style="text-align:center">Tự động chống rời tab & sao chép đề</div>
   </div>
 
   <!-- HOME -->
   <div id="screen-home" class="screen">
     <div>
       <div class="top-bar">
-        <div class="brand">TACTICAL MENU</div>
-        <div class="user-badge" id="lbl-points">0 XP</div>
+        <div class="brand">Trang chính</div>
+        <div class="pill" id="lbl-points">0 XP</div>
       </div>
 
       <div class="card">
-        <div style="font-size:11px;color:var(--text-dim)">HỒ SƠ TÁC CHIẾN</div>
-        <div id="lbl-username" style="font-size:15px;color:var(--accent);margin:4px 0 8px;font-weight:700"></div>
-        <div style="background:#020204;height:6px;border-radius:3px;overflow:hidden;border:1px solid var(--panel-border)">
-          <div id="progress-bar" style="background:var(--success);width:0%;height:100%;"></div>
+        <div class="sub">Tài khoản</div>
+        <div id="lbl-username" style="font-size:15px;font-weight:600;margin:3px 0 10px"></div>
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-fill"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:5px">
+        <div class="q-meta" style="margin-top:7px;margin-bottom:0">
           <span id="lbl-goal-text">Mốc: 10.000 XP • Thưởng: 10.000 VNĐ</span>
-          <span id="lbl-diff-pct" style="color:var(--accent)">ĐỘ KHÓ: +10%</span>
+          <span id="lbl-diff-pct">Độ khó: <b>+10%</b></span>
         </div>
       </div>
 
-      <!-- TÙY CHỈNH MỐC & TIỀN THƯỞNG -->
-      <div class="card" style="border-color:var(--accent);padding:12px">
-        <h3 style="color:var(--accent);font-size:12px;margin-bottom:6px;letter-spacing:1px">⚙️ CHỈNH TIỀN THƯỞNG & MỐC XP</h3>
+      <!-- CÀI ĐẶT TIỀN THƯỞNG & MỐC XP -->
+      <div class="card">
+        <div class="card-title">Mốc thưởng & tiền thưởng</div>
         <div class="grid-2">
           <div>
-            <label>MỐC XP NHẬN</label>
+            <label>Mốc XP</label>
             <input id="cfg-target-xp" type="number" min="500" step="500" value="10000" style="margin:0">
           </div>
           <div>
-            <label>TIỀN THƯỞNG (VNĐ)</label>
+            <label>Tiền thưởng (VNĐ)</label>
             <input id="cfg-reward-vnd" type="number" min="1000" step="1000" value="10000" style="margin:0">
           </div>
         </div>
-        <button class="btn" style="margin:6px 0 0;min-height:38px" onclick="saveRewardConfig()">ÁP DỤNG & CẬP NHẬT % ĐỘ KHÓ</button>
+        <button class="btn outline-accent" style="margin-top:8px;margin-bottom:0" onclick="saveRewardConfig()">Lưu & tính lại độ khó</button>
       </div>
 
-      <!-- CODE THƯỞNG -->
-      <div class="card" style="border-color:var(--success);padding:12px">
-        <label style="color:var(--success);margin-bottom:4px">NHẬP MÃ QUÀ TẶNG (CODE +5.000 XP)</label>
+      <!-- NHẬP CODE -->
+      <div class="card">
+        <label style="margin-bottom:4px">Mã quà tặng (+5.000 XP)</label>
         <div style="display:flex;gap:8px">
-          <input id="in-code" type="text" placeholder="MÃ CODE..." style="margin:0;text-transform:uppercase">
-          <button class="btn success" style="margin:0;width:95px;min-height:42px" onclick="redeemCode()">NHẬN</button>
+          <input id="in-code" type="text" placeholder="Nhập mã..." style="margin:0;text-transform:uppercase">
+          <button class="btn ok" style="margin:0;width:88px" onclick="redeemCode()">Áp dụng</button>
         </div>
       </div>
 
       <!-- BẢNG XẾP HẠNG -->
-      <div class="card" style="border-color:var(--accent)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <h3 style="color:var(--accent);font-size:12px;letter-spacing:1px">🏆 BẢNG XẾP HẠNG TOÀN LỚP</h3>
-          <span style="font-size:10px;color:var(--success)">● LIVE</span>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="card-title" style="margin:0">Bảng xếp hạng</div>
+          <span class="sub">Realtime</span>
         </div>
-        <div style="max-height:110px;overflow-y:auto">
-          <table class="leaderboard-table">
-            <thead><tr><th>Hạng</th><th>Tên Thành Viên</th><th>Điểm XP</th></tr></thead>
+        <div style="max-height:115px;overflow-y:auto">
+          <table class="table">
+            <thead><tr><th>#</th><th>Tên</th><th style="text-align:right">Điểm</th></tr></thead>
             <tbody id="leaderboard-list">
-              <tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Đang tải dữ liệu...</td></tr>
+              <tr><td colspan="3" class="sub" style="text-align:center">Đang tải...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <button class="btn" onclick="openRoom(1)">PHÒNG 1: HACKER TERMINAL (50 CÂU)</button>
-      <button class="btn" onclick="openRoom(2)">PHÒNG 2: TƯ DUY ĐA TẦNG (50 CÂU)</button>
+      <button class="btn primary" onclick="openRoom(1)">Bộ 1: Biến đổi & Thuật toán (50 câu)</button>
+      <button class="btn outline-accent" onclick="openRoom(2)">Bộ 2: Tư duy nhiều bước (50 câu)</button>
 
-      <!-- PVP -->
-      <div class="card" style="border-color:var(--danger);padding:12px">
-        <h3 style="color:var(--danger);font-size:12px;margin-bottom:6px">⚔️ PHÒNG 3: THÁCH ĐẤU 1v1 (CƯỢC ĐIỂM)</h3>
+      <!-- ĐẤU 1V1 -->
+      <div class="card">
+        <div class="card-title">Đấu nhanh 1v1</div>
         <select id="pvp-bet">
           <option value="1000">Cược 1.000 XP</option>
           <option value="3000">Cược 3.000 XP</option>
           <option value="5000">Cược 5.000 XP</option>
         </select>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="btn danger" style="margin:0" onclick="createPvpRoom()">TẠO PHÒNG</button>
-          <input id="pvp-join-code" type="text" placeholder="MÃ PHÒNG" maxlength="6" style="margin:0;text-transform:uppercase;text-align:center;font-weight:bold">
-          <button class="btn success" style="margin:0;width:95px" onclick="joinPvpRoom()">VÀO ĐẤU</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn danger" style="margin:0" onclick="createPvpRoom()">Tạo phòng</button>
+          <input id="pvp-join-code" type="text" placeholder="Mã" maxlength="6" style="margin:0;text-transform:uppercase;text-align:center;font-weight:600">
+          <button class="btn ok" style="margin:0;width:88px" onclick="joinPvpRoom()">Vào</button>
         </div>
       </div>
 
-      <button class="btn success" id="btn-voucher" style="display:none" onclick="openVoucher()">🎉 XUẤT PHIẾU NHẬN THƯỞNG</button>
-      <button class="btn" style="border-color:var(--success);color:var(--success);display:none" id="btn-admin" onclick="openAdmin()">TRUY CẬP ADMIN PANEL</button>
+      <button class="btn ok" id="btn-voucher" style="display:none" onclick="openVoucher()">Nhận phiếu thưởng</button>
+      <button class="btn" id="btn-admin" style="display:none" onclick="openAdmin()">Quản trị (Admin)</button>
     </div>
-    <button class="btn danger" onclick="logoutAction()" style="margin-bottom:6px">ĐĂNG XUẤT</button>
+
+    <button class="btn danger" onclick="logoutAction()" style="margin-bottom:0">Đăng xuất</button>
   </div>
 
   <!-- QUIZ -->
   <div id="screen-quiz" class="screen">
     <div>
       <div class="top-bar">
-        <div class="brand" id="quiz-title">CHIẾN TRƯỜNG</div>
-        <div class="user-badge" id="quiz-points">0 XP</div>
+        <div class="brand" id="quiz-title">Làm bài</div>
+        <div class="pill" id="quiz-points">0 XP</div>
       </div>
+
       <div class="card">
         <div class="q-meta">
-          <span id="q-progress">CÂU 1/50</span>
-          <span id="q-diff">ĐỘ KHÓ: +10%</span>
-          <span id="q-timer">⏱ 40s</span>
-          <span id="q-reward">THƯỞNG: +500 XP</span>
+          <span id="q-progress">Câu 1/50</span>
+          <span id="q-diff">Độ khó: <b>+10%</b></span>
+          <span id="q-timer">40s</span>
+          <span id="q-reward">+550 XP</span>
         </div>
-        <div id="quiz-question" class="terminal-box"></div>
+        <div id="quiz-question" class="q-box"></div>
       </div>
-      <label>ĐÁP ÁN CHÍNH XÁC</label>
-      <textarea id="quiz-ans" placeholder="Nhập đáp án cuối cùng..." onpaste="return false" ondrop="return false"></textarea>
-      <button class="btn success" onclick="submitQuiz()">NỘP ĐÁP ÁN</button>
+
+      <label>Đáp án</label>
+      <textarea id="quiz-ans" placeholder="Nhập đáp án..." onpaste="return false" ondrop="return false"></textarea>
+      <button class="btn primary" onclick="submitQuiz()">Nộp đáp án</button>
     </div>
-    <button class="btn danger" onclick="exitRoomWithPenalty()" style="margin-bottom:6px">THOÁT PHÒNG (RESET 50 CÂU)</button>
+
+    <button class="btn danger" onclick="exitRoomWithPenalty()" style="margin-bottom:0">Thoát & làm bộ câu mới</button>
   </div>
 
   <!-- PVP WAIT -->
   <div id="screen-pvp-wait" class="screen">
     <div>
-      <div class="top-bar"><div class="brand" style="color:var(--danger)">1v1 ARENA // CHỜ ĐỐI THỦ</div></div>
+      <div class="top-bar"><div class="brand">Phòng chờ 1v1</div></div>
       <div class="card" style="text-align:center">
-        <div style="font-size:11px;color:var(--text-dim)">MÃ PHÒNG CỦA BẠN</div>
+        <div class="sub">Mã phòng</div>
         <div class="room-code-display" id="pvp-display-code">------</div>
-        <p style="font-size:12px;color:var(--text);margin-top:8px">Gửi mã này cho đối thủ.<br>Trận đấu tự động bắt đầu khi có người vào nhận kèo!</p>
+        <p class="sub">Đưa mã này cho người chơi khác để bắt đầu.</p>
       </div>
     </div>
-    <button class="btn danger" onclick="cancelPvpRoom()" style="margin-bottom:6px">HỦY PHÒNG & HOÀN ĐIỂM</button>
+    <button class="btn danger" onclick="cancelPvpRoom()" style="margin-bottom:0">Hủy phòng & hoàn điểm</button>
   </div>
 
   <!-- PVP PLAY -->
   <div id="screen-pvp-play" class="screen">
     <div>
       <div class="top-bar">
-        <div class="brand" style="color:var(--danger)">⚔️ 1v1 ĐẤU TRƯỜNG KHÔ MÁU</div>
-        <div class="user-badge" id="pvp-play-badge">CƯỢC</div>
+        <div class="brand">Đấu 1v1</div>
+        <div class="pill" id="pvp-play-badge">Cược</div>
       </div>
       <div class="timer-display" id="pvp-timer">45</div>
       <div class="card">
-        <div id="pvp-q-box" class="terminal-box"></div>
+        <div id="pvp-q-box" class="q-box"></div>
       </div>
-      <label>ĐÁP ÁN 1v1</label>
-      <textarea id="pvp-ans" placeholder="Gõ đáp án..." onpaste="return false" ondrop="return false"></textarea>
-      <button class="btn danger" onclick="submitPvpAnswer()">NỘP BÀI THẮNG THUA</button>
+      <label>Đáp án</label>
+      <textarea id="pvp-ans" placeholder="Nhập đáp án..." onpaste="return false" ondrop="return false"></textarea>
+      <button class="btn primary" onclick="submitPvpAnswer()">Nộp bài</button>
     </div>
-    <button class="btn danger" style="margin-bottom:6px;opacity:0.3;pointer-events:none">ĐANG CHIẾN...</button>
+    <button class="btn" style="margin-bottom:0;opacity:0.4;pointer-events:none">Đang thi đấu...</button>
   </div>
 
   <!-- VOUCHER -->
   <div id="screen-voucher" class="screen" style="justify-content:center">
-    <div class="card" style="text-align:center;border-color:var(--accent)">
-      <h2 style="color:var(--accent);letter-spacing:2px;margin-bottom:6px">SÉC QUÀ TẶNG</h2>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">BAN TỔ CHỨC LỚP HỌC</div>
-      <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0" id="v-name"></div>
-      <div style="font-size:32px;font-weight:800;color:var(--success);margin:8px 0;" id="v-amount">10.000 VNĐ</div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:12px">Chụp màn hình đưa cho Ban Tổ Chức nhận tiền thưởng.</div>
-      <div style="font-size:11px;color:var(--accent);margin-top:6px" id="v-id"></div>
+    <div class="card" style="text-align:center">
+      <div class="sub" style="margin-bottom:6px">PHIẾU XÁC NHẬN THƯỞNG</div>
+      <div style="font-size:18px;font-weight:700;margin:6px 0" id="v-name"></div>
+      <div style="font-size:30px;font-weight:700;color:var(--accent);margin:10px 0" id="v-amount">10.000 VNĐ</div>
+      <div class="sub" id="v-id"></div>
+      <p class="sub" style="margin-top:12px">Chụp màn hình gửi người tổ chức để đối chiếu.</p>
     </div>
-    <button class="btn" onclick="goHome()">QUAY LẠI MENU</button>
+    <button class="btn primary" onclick="goHome()">Về trang chính</button>
   </div>
 
   <!-- ADMIN -->
   <div id="screen-admin" class="screen">
     <div>
       <div class="top-bar">
-        <div class="brand" style="color:var(--danger)">ADMIN OVERLORD</div>
-        <div class="user-badge" style="border-color:var(--danger);color:var(--danger)">QUYỀN TỐI CAO</div>
+        <div class="brand">Quản trị</div>
+        <span class="pill">Admin</span>
       </div>
-      <div class="card" style="border-color:var(--danger)">
-        <h3 style="color:var(--danger);font-size:13px;margin-bottom:6px">QUẢN LÝ THÀNH VIÊN TRỰC TUYẾN</h3>
-        <div style="max-height:200px;overflow-y:auto">
-          <table class="leaderboard-table">
-            <thead><tr><th>Họ Tên</th><th>Điểm / Lỗi</th><th>Thao Tác</th></tr></thead>
+      <div class="card">
+        <div class="card-title">Danh sách người chơi</div>
+        <div style="max-height:210px;overflow-y:auto">
+          <table class="table">
+            <thead><tr><th>Tên</th><th>Điểm / Cảnh báo</th><th></th></tr></thead>
             <tbody id="admin-user-list"></tbody>
           </table>
         </div>
       </div>
       <div class="card">
-        <label>TẠO MÃ CODE QUÀ TẶNG +5.000 XP MỚI</label>
+        <label>Tạo mã quà tặng (+5.000 XP)</label>
         <div style="display:flex;gap:8px">
-          <input id="admin-new-code" type="text" placeholder="VD: VIP2026" style="margin:0;text-transform:uppercase">
-          <button class="btn" style="margin:0;width:95px;min-height:42px" onclick="adminCreateCode()">TẠO MÃ</button>
+          <input id="admin-new-code" type="text" placeholder="Ví dụ: CODE5K" style="margin:0;text-transform:uppercase">
+          <button class="btn primary" style="margin:0;width:88px" onclick="adminCreateCode()">Tạo</button>
         </div>
       </div>
     </div>
-    <button class="btn" onclick="goHome()" style="margin-bottom:6px">THOÁT ADMIN PANEL</button>
+    <button class="btn" onclick="goHome()" style="margin-bottom:0">Quay lại</button>
   </div>
 
-  <!-- OVERLAYS -->
-  <div id="alert-box" class="alert-overlay">
-    <h2 style="color:var(--danger);margin-bottom:8px">🚨 CẢNH BÁO BẢO MẬT</h2>
-    <p id="alert-msg" style="font-size:14px;margin-bottom:10px;color:var(--text)"></p>
-  </div>
-
+  <!-- BANNED -->
   <div id="banned-box" class="banned-overlay">
-    <h1 style="font-size:32px;margin-bottom:8px;">BỊ KHÓA TRUY CẬP</h1>
-    <p style="font-size:13px;line-height:1.5">Tài khoản đã bị khóa vĩnh viễn do vi phạm quy tắc.</p>
+    <h2 style="margin-bottom:8px">Tài khoản đã bị khóa</h2>
+    <p class="sub" style="color:#fda4af">Liên hệ người quản trị nếu cần hỗ trợ.</p>
   </div>
 
   <div id="popup-notify" class="popup-notify"></div>
@@ -551,7 +580,6 @@ function createUniqueSeed() {
   return ((Date.now() % 900000) + Math.floor(Math.random() * 900000) + 100000);
 }
 
-// 10k VNĐ = +10% độ khó, tăng thêm 10k tăng thêm +10%
 function getDifficultyPercent() {
   return Math.max(10, Math.round((state.rewardVnd / 10000) * 10));
 }
@@ -560,7 +588,7 @@ function getDifficultyMultiplier() {
   return 1 + getDifficultyPercent() / 100;
 }
 
-// PHÒNG THỦ CHỐNG RỜI TAB / CHỤP MÀN HÌNH / COPY
+// CHỐNG RỜI TAB / CHỤP MÀN HÌNH / COPY
 function handleAntiCheatViolation(reason) {
   if (!state.name || state.isBanned) return;
   document.body.classList.add('privacy-blur');
@@ -570,17 +598,17 @@ function handleAntiCheatViolation(reason) {
   if (state.currentRoom > 0) {
     state.points = Math.max(0, state.points - 250);
     syncUserData();
-    popup(`⚠️ ${reason} (-250 XP)`);
+    popup(`${reason} (-250 XP)`);
     if (state.tabSwitchCount >= 2) {
       state.tabSwitchCount = 0;
       setTimeout(() => {
         advanceQuestion();
-        popup('🔄 Đổi câu hỏi do rời màn hình nhiều lần!');
+        popup('Đổi câu do rời màn hình nhiều lần');
       }, 650);
     }
   } else {
     syncUserData();
-    popup(`⚠️ ${reason}`);
+    popup(reason);
   }
 
   setTimeout(() => {
@@ -591,7 +619,7 @@ function handleAntiCheatViolation(reason) {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && (state.currentRoom > 0 || state.pvp)) {
     document.body.classList.add('privacy-blur');
-    handleAntiCheatViolation('Phát hiện rời tab/ẩn màn hình');
+    handleAntiCheatViolation('Phát hiện rời màn hình');
   } else {
     setTimeout(() => document.body.classList.remove('privacy-blur'), 350);
   }
@@ -616,7 +644,7 @@ document.addEventListener('contextmenu', (e) => {
 document.addEventListener('copy', (e) => {
   if (e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
     e.preventDefault();
-    handleAntiCheatViolation('Cấm sao chép nội dung');
+    handleAntiCheatViolation('Không cho phép sao chép');
   }
 });
 
@@ -627,7 +655,7 @@ document.addEventListener('keydown', (e) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText('SCREENSHOT_BLOCKED').catch(() => {});
     }
-    handleAntiCheatViolation('Chặn thao tác chụp màn hình');
+    handleAntiCheatViolation('Đã chặn chụp màn hình');
     return;
   }
   if (
@@ -638,7 +666,7 @@ document.addEventListener('keydown', (e) => {
   ) {
     if (!(e.ctrlKey && key === 'c' && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT'))) {
       e.preventDefault();
-      handleAntiCheatViolation('Thao tác bị khóa');
+      handleAntiCheatViolation('Thao tác bị hạn chế');
     }
   }
 });
@@ -659,7 +687,7 @@ function saveRewardConfig() {
   const xpVal = parseInt(document.getElementById('cfg-target-xp').value, 10);
   const vndVal = parseInt(document.getElementById('cfg-reward-vnd').value, 10);
   if (!xpVal || xpVal < 500 || !vndVal || vndVal < 1000) {
-    return alert('Mốc XP tối thiểu 500 và tiền thưởng tối thiểu 1.000 VNĐ!');
+    return alert('Mốc XP tối thiểu 500 và tiền thưởng tối thiểu 1.000 VNĐ.');
   }
   state.targetXp = xpVal;
   state.rewardVnd = vndVal;
@@ -667,7 +695,7 @@ function saveRewardConfig() {
   db.ref('config/reward').set({ targetXp: xpVal, rewardVnd: vndVal });
   syncUserData();
   updateHomeUI();
-  popup(`ĐÃ LƯU • ĐỘ KHÓ +${getDifficultyPercent()}%`);
+  popup(`Đã cập nhật • Độ khó +${getDifficultyPercent()}%`);
 }
 
 // LẮNG NGHE USERS REALTIME
@@ -708,7 +736,7 @@ function syncUserData() {
   });
 }
 
-// PHÒNG 1: 50 CÂU NHIỀU BƯỚC BIẾN ĐỔI + RÀNG BUỘC ĐIỀU KIỆN (KHÓ ĐOÁN HƠN ĐỀ CƠ BẢN)
+// BỘ 1: 50 CÂU NHIỀU BƯỚC BIẾN ĐỔI + RÀNG BUỘC THEO CHU KỲ 5 DẠNG
 function generate50HackerQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
@@ -725,19 +753,16 @@ function generate50HackerQuestions(seed) {
     const m = ((i + round) % 4) + 3;
 
     if (type === 1) {
-      // Chuỗi 3 bước biến đổi có điều kiện chẵn/lẻ
-      let val = a;
-      val = val * 2 + b;
+      let val = a * 2 + b;
       val = (val % m === 0) ? (val / m + round * scale) : (val - (val % m) + m);
       items.push({
         id: `H1-${i}`,
         pct,
-        q: `[#${i}/50 • Chuỗi trạng thái • +${pct}%]\nKhởi tạo st = ${a}, mod = ${m}.\n1) st = st * 2 + ${b}\n2) Nếu st % mod == 0 thì st = st / mod + ${round * scale}; ngược lại st = st - (st % mod) + mod.\nGiá trị cuối của st là bao nhiêu?`,
+        q: `Câu ${i}/50 (Biến đổi trạng thái • +${pct}%)\nCho st = ${a}, mod = ${m}.\n1) st = st * 2 + ${b}\n2) Nếu st chia hết cho mod thì st = st / mod + ${round * scale}, ngược lại st = st - (st % mod) + mod.\nGiá trị cuối của st là bao nhiêu?`,
         ans: [String(val)],
         pts
       });
     } else if (type === 2) {
-      // Tổng có điều kiện lọc bội số
       const n = Math.min(28, 8 + round * 2 + Math.floor(pct / 20));
       const k = ((i % 3) + 2);
       let sum = 0;
@@ -747,24 +772,22 @@ function generate50HackerQuestions(seed) {
       items.push({
         id: `H2-${i}`,
         pct,
-        q: `[#${i}/50 • Lọc bội số • +${pct}%]\nDuyệt các số nguyên từ 1 đến ${n}.\nBỏ qua mọi số chia hết cho ${k}, cộng dồn các số còn lại.\nTổng nhận được là bao nhiêu?`,
+        q: `Câu ${i}/50 (Tổng có điều kiện • +${pct}%)\nCộng các số nguyên từ 1 đến ${n}, nhưng bỏ qua các số chia hết cho ${k}.\nTổng nhận được là bao nhiêu?`,
         ans: [String(sum)],
         pts
       });
     } else if (type === 3) {
-      // Mã hóa dịch vòng + nhân hệ số
       const baseNum = ((i * 5 + s) % 19) + 11;
       const shifted = ((baseNum * 3 + round) % 97) + 13;
       const ans = shifted - (baseNum % 5);
       items.push({
         id: `H3-${i}`,
         pct,
-        q: `[#${i}/50 • Biến đổi mã • +${pct}%]\nCho key = ${baseNum}.\nĐặt temp = ((key * 3 + ${round}) % 97) + 13.\nKết quả của (temp - (key % 5)) bằng bao nhiêu?`,
+        q: `Câu ${i}/50 (Công thức nhiều bước • +${pct}%)\nCho key = ${baseNum}.\nĐặt temp = ((key * 3 + ${round}) % 97) + 13.\nTính temp - (key % 5).`,
         ans: [String(ans)],
         pts
       });
     } else if (type === 4) {
-      // Truy cập chỉ số sau khi đảo chiều/dịch chuyển
       const len = 7 + (i % 6) + Math.floor(pct / 25);
       const shift = (round + (i % 4)) % len;
       const targetIdx = (i + round * 2) % len;
@@ -772,19 +795,18 @@ function generate50HackerQuestions(seed) {
       items.push({
         id: `H4-${i}`,
         pct,
-        q: `[#${i}/50 • Dịch vòng mảng • +${pct}%]\nMảng dài ${len} phần tử (index 0..${len - 1}) bị dịch trái ${shift} vị trí (phần tử đầu chuyển ra cuối).\nPhần tử nằm ở index ${targetIdx} sau khi dịch vốn ở index bao nhiêu ban đầu?`,
+        q: `Câu ${i}/50 (Dịch vòng chỉ số • +${pct}%)\nDãy gồm ${len} phần tử đánh số từ 0 đến ${len - 1}, dịch trái ${shift} bước (phần tử đầu ra cuối).\nPhần tử ở vị trí ${targetIdx} sau dịch vốn ở vị trí nào ban đầu?`,
         ans: [String(originalIdx)],
         pts
       });
     } else {
-      // Hệ số nhân lũy tiến nhiều tầng
       const x0 = ((i * 3 + s) % 6) + 2;
       const stepAdd = round + Math.floor(pct / 25);
       const ans = (x0 + stepAdd) * (x0 + stepAdd * 2) - m;
       items.push({
         id: `H5-${i}`,
         pct,
-        q: `[#${i}/50 • Đa tầng • +${pct}%]\nCho p = ${x0}, d = ${stepAdd}, sub = ${m}.\nTính ((p + d) * (p + 2 * d)) - sub.`,
+        q: `Câu ${i}/50 (Biểu thức ghép • +${pct}%)\nCho p = ${x0}, d = ${stepAdd}, sub = ${m}.\nTính ((p + d) * (p + 2 * d)) - sub.`,
         ans: [String(ans)],
         pts
       });
@@ -793,7 +815,7 @@ function generate50HackerQuestions(seed) {
   return items;
 }
 
-// PHÒNG 2: 50 CÂU TƯ DUY ĐA TẦNG / TÌNH HUỐNG NHIỀU RÀNG BUỘC (KHÓ ĐOÁN KHI HỎI MỒM)
+// BỘ 2: 50 CÂU TƯ DUY NHIỀU BƯỚC THEO 10 CHỦ ĐỀ (MỖI CHỦ ĐỀ 5 CÂU)
 function generate50RiddleQuestions(seed) {
   const pct = getDifficultyPercent();
   const mult = getDifficultyMultiplier();
@@ -809,31 +831,28 @@ function generate50RiddleQuestions(seed) {
     const v = (((i * 6 + s) % 7) + 2) * step;
 
     if (topic === 1) {
-      // Quy tắc ánh xạ ký tự/số tự định nghĩa trong đề
       const codeChar = ['A', 'B', 'C', 'D', 'E'][(i + s) % 5];
       const base = u + v;
       const val = base * 2 + (k + 1) * step;
       items.push({
         id: `M1-${i}`,
         pct,
-        q: `[#${i}/50 • Quy tắc ẩn • +${pct}%]\nTrong hệ quy ước riêng:\nMỗi lần gặp '${codeChar}' thì cộng thêm ${base}, sau đó nhân 2 rồi cộng thêm ${(k + 1) * step}.\nVới 1 lần '${codeChar}' xuất hiện, giá trị thu được là bao nhiêu?`,
+        q: `Câu ${i}/50 (Quy tắc riêng • +${pct}%)\nQuy ước: gặp '${codeChar}' thì cộng ${base}, rồi nhân 2, cuối cùng cộng thêm ${(k + 1) * step}.\nVới 1 lần '${codeChar}', kết quả là bao nhiêu?`,
         ans: [String(val)],
         pts
       });
     } else if (topic === 2) {
-      // Bài toán ràng buộc 2 điều kiện số học
       const x = u + 3;
       const y = v + 2;
       const ans = x * 3 + y * 2 - step;
       items.push({
         id: `M2-${i}`,
         pct,
-        q: `[#${i}/50 • Ràng buộc kép • +${pct}%]\nCó hai biến X = ${x} và Y = ${y}.\nTính giá trị của (3*X + 2*Y) sau khi khấu trừ ${step} đơn vị.`,
+        q: `Câu ${i}/50 (Ràng buộc số • +${pct}%)\nCho X = ${x}, Y = ${y}.\nTính (3*X + 2*Y) rồi trừ đi ${step}.`,
         ans: [String(ans)],
         pts
       });
     } else if (topic === 3) {
-      // Quy luật dãy số nhân + cộng lệch
       const start = u;
       const mul = 2;
       const add = v;
@@ -843,12 +862,11 @@ function generate50RiddleQuestions(seed) {
       items.push({
         id: `M3-${i}`,
         pct,
-        q: `[#${i}/50 • Chuỗi phi tuyến • +${pct}%]\nSố đầu tiên là ${start}. Mỗi số tiếp theo bằng (số trước * ${mul} + ${add}).\nSố thứ 3 trong chuỗi là bao nhiêu?`,
+        q: `Câu ${i}/50 (Dãy số biến đổi • +${pct}%)\nSố đầu là ${start}. Mỗi số sau bằng (số trước * ${mul} + ${add}).\nSố thứ 3 trong chuỗi là bao nhiêu?`,
         ans: [String(n3)],
         pts
       });
     } else if (topic === 4) {
-      // Thời gian lệch múi + chênh lệch hành trình
       const minPerHop = (k + 2) * 10 * step;
       const stops = (k % 3) + 3;
       const rest = (k + 1) * 5 * step;
@@ -856,24 +874,22 @@ function generate50RiddleQuestions(seed) {
       items.push({
         id: `M4-${i}`,
         pct,
-        q: `[#${i}/50 • Lịch trình • +${pct}%]\nMột chuyến đi gồm ${stops} chặng, mỗi chặng mất ${minPerHop} phút.\nGiữa 2 chặng liền kề nghỉ ${rest} phút.\nTổng thời gian từ đầu đến cuối là bao nhiêu phút?`,
+        q: `Câu ${i}/50 (Thời gian hành trình • +${pct}%)\nCó ${stops} chặng, mỗi chặng ${minPerHop} phút. Giữa hai chặng liên tiếp nghỉ ${rest} phút.\nTổng thời gian từ lúc bắt đầu đến hết là bao nhiêu phút?`,
         ans: [String(total)],
         pts
       });
     } else if (topic === 5) {
-      // Hình khối / ghép cắt phần
       const side = u + 3;
       const cut = Math.min(side - 1, (k % 2) + 1);
       const areaRemain = side * side - cut * cut;
       items.push({
         id: `M5-${i}`,
         pct,
-        q: `[#${i}/50 • Cắt ghép • +${pct}%]\nMột tấm bìa vuông cạnh ${side} bị khoét mất một ô vuông nhỏ cạnh ${cut}.\nDiện tích phần bìa còn lại là bao nhiêu?`,
+        q: `Câu ${i}/50 (Diện tích phần còn lại • +${pct}%)\nTấm vuông cạnh ${side} bị cắt bỏ một hình vuông nhỏ cạnh ${cut}.\nDiện tích phần còn lại là bao nhiêu?`,
         ans: [String(areaRemain)],
         pts
       });
     } else if (topic === 6) {
-      // Chia phần có dư / chênh lệch
       const perGroup = u + 4;
       const groups = (k % 3) + 3;
       const extra = v;
@@ -881,24 +897,22 @@ function generate50RiddleQuestions(seed) {
       items.push({
         id: `M6-${i}`,
         pct,
-        q: `[#${i}/50 • Phân bổ • +${pct}%]\nCó ${groups} tổ, mỗi tổ được cấp ${perGroup} phần, và còn dư thêm ${extra} phần dự phòng.\nTổng số phần đã cấp và dự phòng là bao nhiêu?`,
+        q: `Câu ${i}/50 (Phân bổ • +${pct}%)\nCó ${groups} nhóm, mỗi nhóm nhận ${perGroup} phần, còn dư ${extra} phần.\nTổng số phần là bao nhiêu?`,
         ans: [String(total)],
         pts
       });
     } else if (topic === 7) {
-      // Suy luận tổng hiệu mở rộng
       const a = u + v + 6;
       const b = u + 1;
       const ans = (a + b) * 2 - a;
       items.push({
         id: `M7-${i}`,
         pct,
-        q: `[#${i}/50 • Suy luận số • +${pct}%]\nCho tổng hai số là ${a + b}, số nhỏ là ${b}.\nLấy tổng đó nhân 2 rồi trừ đi số lớn, kết quả là bao nhiêu?`,
+        q: `Câu ${i}/50 (Tổng - hiệu • +${pct}%)\nTổng hai số là ${a + b}, số nhỏ là ${b}.\nLấy tổng đó nhân 2 rồi trừ đi số lớn, được bao nhiêu?`,
         ans: [String(ans)],
         pts
       });
     } else if (topic === 8) {
-      // Chuyển động hai giai đoạn
       const v1 = (k + 2) * 15 * step;
       const t1 = 2;
       const v2 = (k + 3) * 10 * step;
@@ -907,12 +921,11 @@ function generate50RiddleQuestions(seed) {
       items.push({
         id: `M8-${i}`,
         pct,
-        q: `[#${i}/50 • Hai giai đoạn • +${pct}%]\nGiai đoạn 1 đi ${v1} km/h trong ${t1} giờ.\nGiai đoạn 2 đi ${v2} km/h trong ${t2} giờ.\nTổng quãng đường đi được là bao nhiêu km?`,
+        q: `Câu ${i}/50 (Quãng đường • +${pct}%)\nĐi ${v1} km/h trong ${t1} giờ, sau đó đi ${v2} km/h trong ${t2} giờ.\nTổng quãng đường là bao nhiêu km?`,
         ans: [String(dist)],
         pts
       });
     } else if (topic === 9) {
-      // Giải ngược 3 phép tính liên tiếp
       const origin = u + 5;
       const mul = (k % 3) + 2;
       const add = v + 2;
@@ -921,19 +934,18 @@ function generate50RiddleQuestions(seed) {
       items.push({
         id: `M9-${i}`,
         pct,
-        q: `[#${i}/50 • Giải ngược • +${pct}%]\nSố ban đầu nhân ${mul}, cộng ${add}, trừ ${sub} được kết quả là ${after}.\nSố ban đầu là bao nhiêu?`,
+        q: `Câu ${i}/50 (Tính ngược • +${pct}%)\nMột số nhân ${mul}, cộng ${add}, trừ ${sub} ra ${after}.\nSố ban đầu là bao nhiêu?`,
         ans: [String(origin)],
         pts
       });
     } else {
-      // Chủ đề 10: Tổng hợp (chỉ câu 46 có 1 bài tuổi, còn lại là bài khác)
       if (k === 0) {
         const child = 5 * step;
         const father = child * 4;
         items.push({
           id: `M10-${i}`,
           pct,
-          q: `[#${i}/50 • Tổng hợp • +${pct}%]\nTuổi bố gấp 4 lần tuổi con. Tổng tuổi hai bố con hiện nay là ${child + father}.\nHỏi sau ${step} năm nữa tuổi bố là bao nhiêu?`,
+          q: `Câu ${i}/50 (Tổng hợp • +${pct}%)\nTuổi bố gấp 4 lần tuổi con, tổng tuổi hiện nay là ${child + father}.\nSau ${step} năm nữa tuổi bố là bao nhiêu?`,
           ans: [String(father + step)],
           pts
         });
@@ -944,7 +956,7 @@ function generate50RiddleQuestions(seed) {
         items.push({
           id: `M10-${i}`,
           pct,
-          q: `[#${i}/50 • Tổng hợp • +${pct}%]\nCho P = ${p} và Q = ${qNum}.\nTính giá trị của (P + Q) * (P - Q).`,
+          q: `Câu ${i}/50 (Tổng hợp • +${pct}%)\nCho P = ${p}, Q = ${qNum}.\nTính (P + Q) * (P - Q).`,
           ans: [String(ans)],
           pts
         });
@@ -966,18 +978,18 @@ class FireworkSystem {
     this.canvas.height = window.innerHeight;
     this.canvas.classList.add('show');
     let count = 0;
-    const interval = setInterval(() => { this.spawn(); count++; if (count > 12) clearInterval(interval); }, 300);
+    const interval = setInterval(() => { this.spawn(); count++; if (count > 10) clearInterval(interval); }, 320);
     if (!this.animId) this.loop();
-    setTimeout(() => this.stop(), 5000);
+    setTimeout(() => this.stop(), 4500);
   }
   spawn() {
     const x = Math.random() * this.canvas.width;
-    const y = Math.random() * (this.canvas.height * 0.5);
-    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    for (let i = 0; i < 50; i++) {
+    const y = Math.random() * (this.canvas.height * 0.45);
+    const color = `hsl(${Math.random() * 360}, 90%, 62%)`;
+    for (let i = 0; i < 40; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 6 + 2;
-      this.particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, decay: Math.random() * 0.015 + 0.01, color });
+      const speed = Math.random() * 5 + 2;
+      this.particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, decay: Math.random() * 0.015 + 0.012, color });
     }
   }
   loop() {
@@ -988,7 +1000,7 @@ class FireworkSystem {
       this.ctx.globalAlpha = Math.max(0, p.alpha);
       this.ctx.fillStyle = p.color;
       this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      this.ctx.arc(p.x, p.y, 2.8, 0, Math.PI * 2);
       this.ctx.fill();
       this.ctx.restore();
       if (p.alpha <= 0) this.particles.splice(index, 1);
@@ -1018,8 +1030,8 @@ function normalizeStr(s) {
 
 function initWatermark(name, cls) {
   let html = '';
-  for (let i = 0; i < 28; i++) {
-    html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}]</span>`;
+  for (let i = 0; i < 24; i++) {
+    html += `<span>${name || 'User'} · ${cls || ''}</span>`;
   }
   document.getElementById('watermark-layer').innerHTML = html;
 }
@@ -1033,7 +1045,7 @@ function popup(txt) {
   const el = document.getElementById('popup-notify');
   el.textContent = txt;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1800);
+  setTimeout(() => el.classList.remove('show'), 1700);
 }
 
 function stopQuestionTimer() {
@@ -1046,15 +1058,15 @@ function stopQuestionTimer() {
 function startQuestionTimer() {
   stopQuestionTimer();
   state.qTimeLeft = 40;
-  document.getElementById('q-timer').textContent = `⏱ ${state.qTimeLeft}s`;
+  document.getElementById('q-timer').textContent = `${state.qTimeLeft}s`;
   state.qTimer = setInterval(() => {
     state.qTimeLeft--;
-    document.getElementById('q-timer').textContent = `⏱ ${Math.max(0, state.qTimeLeft)}s`;
+    document.getElementById('q-timer').textContent = `${Math.max(0, state.qTimeLeft)}s`;
     if (state.qTimeLeft <= 0) {
       stopQuestionTimer();
       state.points = Math.max(0, state.points - 200);
       syncUserData();
-      popup('⏰ Hết giờ làm câu này (-200 XP)');
+      popup('Hết giờ câu này (-200 XP)');
       advanceQuestion();
     }
   }, 1000);
@@ -1063,11 +1075,11 @@ function startQuestionTimer() {
 function loginAction() {
   let name = document.getElementById('in-name').value.trim();
   let cls = document.getElementById('in-class').value.trim();
-  if (!name || !cls) return alert('Vui lòng nhập đầy đủ họ tên và lớp!');
+  if (!name || !cls) return alert('Nhập đủ họ tên và lớp.');
 
   if (name.toUpperCase() === 'ADMIN' || name.toUpperCase() === 'T.N.TUAN ANH') {
     name = 'ADMIN';
-    cls = 'OVERLORD';
+    cls = 'Admin';
   }
 
   state.name = name;
@@ -1112,13 +1124,13 @@ function updateHomeUI() {
   const pct = getDifficultyPercent();
   const reached = state.points >= state.targetXp;
 
-  document.getElementById('lbl-username').textContent = state.name + ' // ' + state.classId;
-  document.getElementById('lbl-points').textContent = state.points.toLocaleString() + ' XP';
-  document.getElementById('quiz-points').textContent = state.points.toLocaleString() + ' XP';
+  document.getElementById('lbl-username').textContent = `${state.name} · ${state.classId}`;
+  document.getElementById('lbl-points').textContent = `${state.points.toLocaleString()} XP`;
+  document.getElementById('quiz-points').textContent = `${state.points.toLocaleString()} XP`;
   document.getElementById('progress-bar').style.width = Math.min(100, (state.points / state.targetXp) * 100) + '%';
   document.getElementById('lbl-goal-text').textContent =
     `Mốc: ${state.targetXp.toLocaleString()} XP • Thưởng: ${state.rewardVnd.toLocaleString()} VNĐ`;
-  document.getElementById('lbl-diff-pct').textContent = `ĐỘ KHÓ: +${pct}%`;
+  document.getElementById('lbl-diff-pct').innerHTML = `Độ khó: <b>+${pct}%</b>`;
 
   if (reached && !state.hasFiredFireworks) {
     state.hasFiredFireworks = true;
@@ -1127,7 +1139,7 @@ function updateHomeUI() {
   }
   const btnVoucher = document.getElementById('btn-voucher');
   btnVoucher.style.display = reached ? 'block' : 'none';
-  btnVoucher.textContent = `🎉 XUẤT PHIẾU NHẬN ${state.rewardVnd.toLocaleString()} VNĐ`;
+  btnVoucher.textContent = `Nhận phiếu thưởng (${state.rewardVnd.toLocaleString()} VNĐ)`;
 
   document.getElementById('btn-admin').style.display = (state.name.toUpperCase() === 'ADMIN') ? 'block' : 'none';
 }
@@ -1144,16 +1156,15 @@ function renderLeaderboard(users) {
   if (!lbox) return;
   lbox.innerHTML = '';
   if (userArr.length === 0) {
-    lbox.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Chưa có dữ liệu</td></tr>`;
+    lbox.innerHTML = `<tr><td colspan="3" class="sub" style="text-align:center">Chưa có dữ liệu</td></tr>`;
     return;
   }
   userArr.forEach((u, idx) => {
     const tr = document.createElement('tr');
-    const rankColor = idx === 0 ? 'color:var(--accent);font-weight:bold' : (idx === 1 ? 'color:var(--success)' : '');
     tr.innerHTML = `
-      <td style="width:36px;text-align:center;${rankColor}">#${idx + 1}</td>
-      <td>${u.name} ${u.banned ? '<span style="color:var(--danger)">[BANNED]</span>' : ''}</td>
-      <td style="text-align:right;font-weight:bold">${(u.points || 0).toLocaleString()} XP</td>
+      <td style="width:32px">${idx + 1}</td>
+      <td>${u.name} ${u.banned ? '<span style="color:var(--danger)">(Khóa)</span>' : ''}</td>
+      <td style="text-align:right;font-weight:600">${(u.points || 0).toLocaleString()}</td>
     `;
     lbox.appendChild(tr);
   });
@@ -1167,11 +1178,11 @@ function renderAdminTable(users) {
     const u = users[key];
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><b>${u.name}</b></td>
-      <td>${u.points || 0} XP (${u.cheatCount || 0} lỗi)</td>
-      <td>
-        <button class="btn danger" style="min-height:28px;padding:3px 6px;font-size:10px;margin:0" onclick="adminToggleBan('${key}')">
-          ${u.isBanned ? 'GỠ BAN' : 'BAN'}
+      <td>${u.name}</td>
+      <td>${u.points || 0} XP (${u.cheatCount || 0})</td>
+      <td style="text-align:right">
+        <button class="btn danger" style="min-height:28px;padding:2px 8px;font-size:11px;margin:0;display:inline-block;width:auto" onclick="adminToggleBan('${key}')">
+          ${u.isBanned ? 'Mở' : 'Khóa'}
         </button>
       </td>
     `;
@@ -1181,17 +1192,17 @@ function renderAdminTable(users) {
 
 function redeemCode() {
   const code = document.getElementById('in-code').value.trim().toUpperCase();
-  if (!code) return alert('Vui lòng nhập mã code!');
+  if (!code) return alert('Nhập mã quà tặng.');
 
   db.ref('codes/' + code).once('value').then((snap) => {
-    if (!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã code không tồn tại!');
-    if (state.redeemedCodes.includes(code)) return alert('Bạn đã nhập mã này rồi!');
+    if (!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã không hợp lệ.');
+    if (state.redeemedCodes.includes(code)) return alert('Bạn đã dùng mã này.');
 
     state.redeemedCodes.push(code);
     state.points += 5000;
     syncUserData();
     document.getElementById('in-code').value = '';
-    popup('NHẬN THÀNH CÔNG +5.000 XP!');
+    popup('Đã cộng +5.000 XP');
   });
 }
 
@@ -1207,7 +1218,7 @@ function openRoom(roomId) {
     state.pool2 = generate50RiddleQuestions(seed);
     state.idx2 = 0;
   }
-  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'TƯ DUY ĐA TẦNG';
+  document.getElementById('quiz-title').textContent = roomId === 1 ? 'Bộ 1: Biến đổi & Thuật toán' : 'Bộ 2: Tư duy nhiều bước';
   renderCurrentQuestion();
   showScreen('screen-quiz');
   startQuestionTimer();
@@ -1234,9 +1245,9 @@ function renderCurrentQuestion() {
   }
 
   const qObj = pool[idx];
-  document.getElementById('q-progress').textContent = `CÂU ${idx + 1}/50`;
-  document.getElementById('q-diff').textContent = `ĐỘ KHÓ: +${qObj.pct}%`;
-  document.getElementById('q-reward').textContent = `THƯỞNG: +${qObj.pts} XP`;
+  document.getElementById('q-progress').textContent = `Câu ${idx + 1}/50`;
+  document.getElementById('q-diff').innerHTML = `Độ khó: <b>+${qObj.pct}%</b>`;
+  document.getElementById('q-reward').textContent = `+${qObj.pts} XP`;
   document.getElementById('quiz-question').textContent = qObj.q;
   document.getElementById('quiz-ans').value = '';
   if (state.currentRoom > 0) startQuestionTimer();
@@ -1250,16 +1261,14 @@ function advanceQuestion() {
 
 function evaluateAnswerOnly(ansRaw, qObj) {
   const a = normalizeStr(ansRaw);
-  if (!a) return { ok: false, reason: 'Chưa nhập đáp án!' };
-
+  if (!a) return { ok: false };
   const matchAns = qObj.ans.some(k => a === normalizeStr(k));
-  if (!matchAns) return { ok: false, reason: 'Đáp án chưa chính xác!' };
-  return { ok: true, pts: qObj.pts };
+  return { ok: matchAns, pts: qObj.pts };
 }
 
 function submitQuiz() {
   const ans = document.getElementById('quiz-ans').value;
-  if (!ans.trim()) return alert('Vui lòng nhập đáp án!');
+  if (!ans.trim()) return alert('Nhập đáp án trước khi nộp.');
 
   const isR1 = state.currentRoom === 1;
   const qObj = isR1 ? state.pool1[state.idx1] : state.pool2[state.idx2];
@@ -1268,18 +1277,18 @@ function submitQuiz() {
   if (res.ok) {
     stopQuestionTimer();
     state.points += res.pts;
-    popup(`CHUẨN XÁC! +${res.pts} XP`);
+    popup(`Đúng rồi (+${res.pts} XP)`);
     syncUserData();
-    setTimeout(advanceQuestion, 750);
+    setTimeout(advanceQuestion, 700);
   } else {
     state.points = Math.max(0, state.points - 300);
-    popup(`SAI ĐÁP ÁN (-300 XP)`);
+    popup('Chưa đúng (-300 XP)');
     syncUserData();
   }
 }
 
 function exitRoomWithPenalty() {
-  if (confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
+  if (confirm('Thoát sẽ tạo bộ 50 câu mới khi vào lại. Tiếp tục?')) {
     stopQuestionTimer();
     const seed = createUniqueSeed();
     if (state.currentRoom === 1) {
@@ -1298,7 +1307,7 @@ function exitRoomWithPenalty() {
 // PVP 1V1
 function createPvpRoom() {
   const bet = +document.getElementById('pvp-bet').value;
-  if (state.points < bet) return alert('Số điểm không đủ để cược!');
+  if (state.points < bet) return alert('Không đủ XP để đặt cược.');
 
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
   const pool = state.pool2.length ? state.pool2 : generate50RiddleQuestions(createUniqueSeed());
@@ -1324,14 +1333,14 @@ function createPvpRoom() {
 
 function joinPvpRoom() {
   const code = document.getElementById('pvp-join-code').value.trim().toUpperCase();
-  if (!code) return alert('Vui lòng nhập mã phòng!');
+  if (!code) return alert('Nhập mã phòng.');
 
   db.ref('pvp_rooms/' + code).once('value').then((snap) => {
     const room = snap.val();
-    if (!room) return alert('Không tìm thấy mã phòng trực tuyến này!');
-    if (room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc!');
-    if (room.host === state.name) return alert('Không thể tự vào phòng của mình!');
-    if (state.points < room.bet) return alert('Bạn không đủ điểm cược!');
+    if (!room) return alert('Không tìm thấy phòng.');
+    if (room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc.');
+    if (room.host === state.name) return alert('Không thể tự vào phòng của mình.');
+    if (state.points < room.bet) return alert('Không đủ XP để nhận cược.');
 
     state.points -= room.bet;
     syncUserData();
@@ -1346,7 +1355,7 @@ function startPvpBattle(room) {
   state.pvp.question = room.question;
   document.getElementById('pvp-q-box').textContent = room.question.q;
   document.getElementById('pvp-ans').value = '';
-  document.getElementById('pvp-play-badge').textContent = 'CƯỢC: ' + room.bet.toLocaleString() + ' XP';
+  document.getElementById('pvp-play-badge').textContent = `Cược ${room.bet.toLocaleString()} XP`;
   showScreen('screen-pvp-play');
 
   let left = 45;
@@ -1377,7 +1386,7 @@ function submitPvpAnswer() {
 
     const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
     db.ref(`pvp_rooms/${state.pvp.code}/answers/${safeKey}`).set(sc);
-    popup('Đang chờ đối thủ nộp bài...');
+    popup('Đang đợi đối thủ...');
 
     db.ref('pvp_rooms/' + state.pvp.code).on('value', (s) => {
       const r = s.val();
@@ -1403,12 +1412,12 @@ function finishPvpBattle(room) {
   const pot = room.bet * 2;
   if (winnerKey === safeKey) {
     state.points += pot;
-    alert('CHIẾN THẮNG! Nhận ' + pot.toLocaleString() + ' XP.');
+    alert(`Thắng kèo! Nhận ${pot.toLocaleString()} XP.`);
   } else if (!winnerKey) {
     state.points += room.bet;
-    alert('HÒA KÈO! Hoàn điểm cược.');
+    alert('Hòa điểm, hoàn lại XP cược.');
   } else {
-    alert('THUA TRẬN! Mất ' + room.bet.toLocaleString() + ' XP.');
+    alert(`Thua kèo, mất ${room.bet.toLocaleString()} XP.`);
   }
 
   syncUserData();
@@ -1435,9 +1444,9 @@ function goHome() {
 }
 
 function openVoucher() {
-  document.getElementById('v-name').textContent = state.name.toUpperCase() + ' (' + state.classId + ')';
-  document.getElementById('v-amount').textContent = state.rewardVnd.toLocaleString() + ' VNĐ';
-  document.getElementById('v-id').textContent = 'MỐC ĐẠT: ' + state.targetXp.toLocaleString() + ' XP • MÃ: ' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  document.getElementById('v-name').textContent = `${state.name} (${state.classId})`;
+  document.getElementById('v-amount').textContent = `${state.rewardVnd.toLocaleString()} VNĐ`;
+  document.getElementById('v-id').textContent = `Mốc ${state.targetXp.toLocaleString()} XP • Mã ${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
   showScreen('screen-voucher');
 }
 
@@ -1452,7 +1461,7 @@ function adminToggleBan(key) {
     if (u) {
       const newBanned = !u.isBanned;
       db.ref('users/' + key).update({ isBanned: newBanned, cheatCount: newBanned ? u.cheatCount : 0 });
-      popup('Đã cập nhật trạng thái thành công');
+      popup('Đã cập nhật');
     }
   });
 }
@@ -1462,7 +1471,7 @@ function adminCreateCode() {
   if (!newCode) return;
   db.ref('codes/' + newCode).set(true);
   document.getElementById('admin-new-code').value = '';
-  popup('TẠO MÃ THÀNH CÔNG: ' + newCode);
+  popup(`Đã tạo mã ${newCode}`);
 }
 </script>
 </body>
