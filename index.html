@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>OVERLORD PROTOCOL // FIXED STABLE</title>
-<!-- Firebase SDK CDN -->
+<title>OVERLORD PROTOCOL // PERCENT DIFFICULTY</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <style>
@@ -22,41 +21,93 @@
   --text-dim: #707085;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  margin: 0;
+  padding: 0;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
 html, body {
-  height: 100%; height: 100dvh;
+  height: 100%;
+  min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Share Tech Mono', 'Courier New', monospace, -apple-system;
+  font-family: 'Courier New', monospace, -apple-system;
   overflow-x: hidden;
-  user-select: none;
-  -webkit-user-select: none;
+}
+
+body.privacy-blur #app {
+  filter: blur(18px) brightness(0.25);
+  transition: filter 0.08s linear;
 }
 
 body::before {
   content: '';
-  position: fixed; inset: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
   background-size: 100% 3px, 3px 100%;
   pointer-events: none;
   z-index: 999;
 }
 
 #watermark-layer {
-  position: fixed; inset: 0; pointer-events: none; z-index: 998;
-  overflow: hidden; opacity: 0.04; display: flex; flex-wrap: wrap; justify-content: space-around; align-content: space-around;
-  font-size: 13px; font-weight: bold; color: var(--accent); transform: rotate(-20deg);
+  position: fixed;
+  inset: -20%;
+  width: 140%;
+  height: 140%;
+  pointer-events: none;
+  z-index: 998;
+  overflow: hidden;
+  opacity: 0.07;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent);
+  transform: rotate(-22deg);
+}
+
+#watermark-layer span {
+  padding: 18px 24px;
 }
 
 #fireworks-canvas {
-  position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
 }
 #fireworks-canvas.show { display: block; }
 
-#app { position: relative; z-index: 2; min-height: 100dvh; padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom); max-width: 480px; margin: 0 auto; }
+#app {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  max-width: 480px;
+  margin: 0 auto;
+}
 
-.screen { display: none !important; min-height: 100dvh; flex-direction: column; justify-content: space-between; }
-.screen.active { display: flex !important; animation: panelIn 0.2s ease; }
+.screen {
+  display: none !important;
+  min-height: 100dvh;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.screen.active {
+  display: flex !important;
+  animation: panelIn 0.2s ease;
+}
 
 @keyframes panelIn {
   from { opacity: 0; transform: scale(0.98); }
@@ -64,99 +115,189 @@ body::before {
 }
 
 .top-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 0; border-bottom: 1px solid var(--panel-border); margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--panel-border);
+  margin-bottom: 14px;
 }
 .brand {
-  color: var(--accent); font-weight: 800; font-size: 14px; letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 2px;
   text-shadow: 0 0 10px var(--accent-glow);
 }
 .user-badge {
-  background: rgba(255,183,0,0.1); border: 1px solid var(--accent);
-  padding: 4px 10px; border-radius: 4px; font-size: 12px; color: var(--accent);
+  background: rgba(255,183,0,0.1);
+  border: 1px solid var(--accent);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--accent);
 }
 
 .card {
-  background: var(--panel); border: 1px solid var(--panel-border);
-  border-radius: 8px; padding: 14px; margin: 8px 0; position: relative;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 14px;
+  margin: 8px 0;
+  position: relative;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 .card::after {
-  content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
   background: var(--accent);
 }
 
 .btn {
-  display: block; width: 100%; min-height: 46px;
+  display: block;
+  width: 100%;
+  min-height: 46px;
   background: linear-gradient(135deg, #221b00, #110d00);
-  border: 1px solid var(--accent); color: var(--accent);
-  font-size: 13px; font-weight: 700; border-radius: 6px;
-  margin: 8px 0; cursor: pointer; letter-spacing: 1px; transition: all 0.15s;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 6px;
+  margin: 8px 0;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
 }
 .btn:active { transform: scale(0.97); background: var(--accent); color: #000; }
 .btn.danger {
-  border-color: var(--danger); color: var(--danger);
+  border-color: var(--danger);
+  color: var(--danger);
   background: linear-gradient(135deg, #2b000a, #140003);
 }
 .btn.danger:active { background: var(--danger); color: #fff; }
 .btn.success {
-  border-color: var(--success); color: var(--success);
+  border-color: var(--success);
+  color: var(--success);
   background: linear-gradient(135deg, #002b2b, #001414);
 }
 .btn.success:active { background: var(--success); color: #000; }
 
 input, textarea, select {
-  width: 100%; background: #050508; border: 1px solid var(--panel-border);
-  color: var(--text); font-size: 16px !important; padding: 11px;
-  border-radius: 6px; margin: 5px 0 9px; outline: none; font-family: inherit;
-  -webkit-user-select: text; user-select: text;
+  width: 100%;
+  background: #050508;
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  font-size: 16px !important;
+  padding: 11px;
+  border-radius: 6px;
+  margin: 5px 0 9px;
+  outline: none;
+  font-family: inherit;
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }
 input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-textarea { min-height: 76px; resize: none; }
+textarea { min-height: 70px; resize: none; }
 label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing: 1px; text-transform: uppercase; }
 
 .terminal-box {
-  background: #020204; border: 1px solid #1f241a; border-radius: 6px;
-  padding: 14px; font-size: 13.5px; line-height: 1.55; color: var(--success);
-  white-space: pre-wrap; word-break: break-word;
+  background: #020204;
+  border: 1px solid #1f241a;
+  border-radius: 6px;
+  padding: 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--success);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 .q-meta {
-  display: flex; justify-content: space-between; font-size: 11px; color: var(--accent);
-  margin-bottom: 8px; border-bottom: 1px dashed #222; padding-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  border-bottom: 1px dashed #222;
+  padding-bottom: 6px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .leaderboard-table {
-  width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 6px;
 }
 .leaderboard-table th, .leaderboard-table td {
-  border: 1px solid var(--panel-border); padding: 6px; text-align: left;
+  border: 1px solid var(--panel-border);
+  padding: 6px;
+  text-align: left;
 }
 .leaderboard-table th { background: #12121c; color: var(--accent); }
 
 .timer-display {
-  font-size: 34px; color: var(--danger); text-align: center; font-weight: 800; margin-bottom: 8px;
+  font-size: 34px;
+  color: var(--danger);
+  text-align: center;
+  font-weight: 800;
+  margin-bottom: 8px;
 }
 .room-code-display {
-  font-size: 28px; letter-spacing: 6px; color: var(--accent); text-align: center; font-weight: 800; margin: 10px 0;
+  font-size: 28px;
+  letter-spacing: 6px;
+  color: var(--accent);
+  text-align: center;
+  font-weight: 800;
+  margin: 10px 0;
 }
 
 .popup-notify {
-  position: fixed; top: 35%; left: 50%; transform: translate(-50%,-50%) scale(0.8);
-  background: rgba(3,3,5,0.96); border: 1px solid var(--accent); color: var(--accent);
-  font-size: 16px; font-weight: 800; padding: 14px 22px; border-radius: 8px;
-  opacity: 0; pointer-events: none; z-index: 10000; transition: all 0.25s; text-align: center;
+  position: fixed;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0.8);
+  background: rgba(3,3,5,0.96);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 800;
+  padding: 14px 22px;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transition: all 0.25s;
+  text-align: center;
   max-width: 90%;
 }
 .popup-notify.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
 
 .alert-overlay, .banned-overlay {
-  position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-  flex-direction: column; z-index: 9999; text-align: center; padding: 24px;
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 9999;
+  text-align: center;
+  padding: 24px;
 }
 .alert-overlay { background: rgba(0,0,0,0.95); }
 .alert-overlay.show { display: flex; }
 .banned-overlay { background: #260007; color: var(--danger); }
 .banned-overlay.show { display: flex; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
 </style>
 </head>
 <body>
@@ -169,10 +310,10 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div>
-      <div class="top-bar"><div class="brand">OVERLORD // CLOUD SYNC</div></div>
+      <div class="top-bar"><div class="brand">OVERLORD // % DIFF</div></div>
       <div class="card" style="margin-top:20px">
         <h2 style="color:var(--accent);margin-bottom:6px;font-size:18px">ĐĂNG NHẬP HỆ THỐNG</h2>
-        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Đồng bộ đám mây trực tuyến chính xác 100%.</p>
+        <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px">10k = +10% độ khó, tăng tiền tăng % • Chỉ điền đáp án.</p>
         <label>HỌ VÀ TÊN</label>
         <input id="in-name" type="text" placeholder="Nguyễn Văn A" maxlength="40" autocomplete="off">
         <label>LỚP / SỐ HIỆU</label>
@@ -180,7 +321,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <button class="btn" onclick="loginAction()">TRUY CẬP CHIẾN TRƯỜNG</button>
       </div>
     </div>
-    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Anti-Cheat v6.5 • Realtime Sync</div>
+    <div style="text-align:center;font-size:11px;color:var(--text-dim);padding-bottom:10px">Scaling % Difficulty • Answer Only</div>
   </div>
 
   <!-- HOME -->
@@ -190,6 +331,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div class="brand">TACTICAL MENU</div>
         <div class="user-badge" id="lbl-points">0 XP</div>
       </div>
+
       <div class="card">
         <div style="font-size:11px;color:var(--text-dim)">HỒ SƠ TÁC CHIẾN</div>
         <div id="lbl-username" style="font-size:15px;color:var(--accent);margin:4px 0 8px;font-weight:700"></div>
@@ -197,14 +339,30 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
           <div id="progress-bar" style="background:var(--success);width:0%;height:100%;"></div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:5px">
-          <span>Mốc quỹ: 10.000 XP</span>
-          <span style="color:var(--success)">⚡ Đã kết nối đám mây</span>
+          <span id="lbl-goal-text">Mốc: 10.000 XP • Thưởng: 10.000 VNĐ</span>
+          <span id="lbl-diff-pct" style="color:var(--accent)">ĐỘ KHÓ: +10%</span>
         </div>
       </div>
 
-      <!-- CODE 5K -->
+      <!-- TÙY CHỈNH MỐC & TIỀN THƯỞNG -->
+      <div class="card" style="border-color:var(--accent);padding:12px">
+        <h3 style="color:var(--accent);font-size:12px;margin-bottom:6px;letter-spacing:1px">⚙️ CHỈNH TIỀN THƯỞNG & MỐC XP</h3>
+        <div class="grid-2">
+          <div>
+            <label>MỐC XP NHẬN</label>
+            <input id="cfg-target-xp" type="number" min="1000" step="500" value="10000" style="margin:0">
+          </div>
+          <div>
+            <label>TIỀN THƯỞNG (VNĐ)</label>
+            <input id="cfg-reward-vnd" type="number" min="1000" step="1000" value="10000" style="margin:0">
+          </div>
+        </div>
+        <button class="btn" style="margin:6px 0 0;min-height:38px" onclick="saveRewardConfig()">ÁP DỤNG & CẬP NHẬT % ĐỘ KHÓ</button>
+      </div>
+
+      <!-- CODE THƯỞNG -->
       <div class="card" style="border-color:var(--success);padding:12px">
-        <label style="color:var(--success);margin-bottom:4px">NHẬP MÃ QUÀ TẶNG (CODE 5K)</label>
+        <label style="color:var(--success);margin-bottom:4px">NHẬP MÃ QUÀ TẶNG (CODE +5.000 XP)</label>
         <div style="display:flex;gap:8px">
           <input id="in-code" type="text" placeholder="MÃ CODE..." style="margin:0;text-transform:uppercase">
           <button class="btn success" style="margin:0;width:95px;min-height:42px" onclick="redeemCode()">NHẬN</button>
@@ -227,9 +385,9 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         </div>
       </div>
 
-      <button class="btn" onclick="openRoom(1)">PHÒNG 1: HACKER TERMINAL (50 CÂU CODE)</button>
-      <button class="btn" onclick="openRoom(2)">PHÒNG 2: ĐỐ MẸO X10 (50 CÂU HẠI NÃO)</button>
-      
+      <button class="btn" onclick="openRoom(1)">PHÒNG 1: HACKER TERMINAL (50 CÂU)</button>
+      <button class="btn" onclick="openRoom(2)">PHÒNG 2: ĐỐ MẸO & TƯ DUY (50 CÂU)</button>
+
       <!-- PVP -->
       <div class="card" style="border-color:var(--danger);padding:12px">
         <h3 style="color:var(--danger);font-size:12px;margin-bottom:6px">⚔️ PHÒNG 3: THÁCH ĐẤU 1v1 (CƯỢC ĐIỂM)</h3>
@@ -245,7 +403,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         </div>
       </div>
 
-      <button class="btn success" id="btn-voucher" style="display:none" onclick="openVoucher()">🎉 XUẤT PHIẾU NHẬN 10.000 VNĐ</button>
+      <button class="btn success" id="btn-voucher" style="display:none" onclick="openVoucher()">🎉 XUẤT PHIẾU NHẬN THƯỞNG</button>
       <button class="btn" style="border-color:var(--success);color:var(--success);display:none" id="btn-admin" onclick="openAdmin()">TRUY CẬP ADMIN PANEL</button>
     </div>
     <button class="btn danger" onclick="logoutAction()" style="margin-bottom:6px">ĐĂNG XUẤT</button>
@@ -261,15 +419,14 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
       <div class="card">
         <div class="q-meta">
           <span id="q-progress">CÂU 1/50</span>
+          <span id="q-diff">ĐỘ KHÓ: +10%</span>
           <span id="q-reward">THƯỞNG: +500 XP</span>
         </div>
         <div id="quiz-question" class="terminal-box"></div>
       </div>
-      <label>1. ĐÁP ÁN CHÍNH XÁC (TỰ ĐIỀN)</label>
+      <label>ĐÁP ÁN CHÍNH XÁC</label>
       <textarea id="quiz-ans" placeholder="Nhập đáp án..." onpaste="return false" ondrop="return false"></textarea>
-      <label>2. GIẢI THÍCH LOGIC VÌ SAO (BẮT BUỘC)</label>
-      <textarea id="quiz-exp" placeholder="Giải thích rõ logic..." onpaste="return false" ondrop="return false"></textarea>
-      <button class="btn success" onclick="submitQuiz()">NỘP BÀI & CHẤM LOGIC</button>
+      <button class="btn success" onclick="submitQuiz()">NỘP ĐÁP ÁN</button>
     </div>
     <button class="btn danger" onclick="exitRoomWithPenalty()" style="margin-bottom:6px">THOÁT PHÒNG (RESET 50 CÂU)</button>
   </div>
@@ -299,9 +456,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         <div id="pvp-q-box" class="terminal-box"></div>
       </div>
       <label>ĐÁP ÁN 1v1</label>
-      <textarea id="pvp-ans" placeholder="Gõ đáp án..." onpaste="return false"></textarea>
-      <label>GIẢI THÍCH LOGIC</label>
-      <textarea id="pvp-exp" placeholder="Giải thích chi tiết..." onpaste="return false"></textarea>
+      <textarea id="pvp-ans" placeholder="Gõ đáp án..." onpaste="return false" ondrop="return false"></textarea>
       <button class="btn danger" onclick="submitPvpAnswer()">NỘP BÀI THẮNG THUA</button>
     </div>
     <button class="btn danger" style="margin-bottom:6px;opacity:0.3;pointer-events:none">ĐANG CHIẾN...</button>
@@ -311,10 +466,10 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
   <div id="screen-voucher" class="screen" style="justify-content:center">
     <div class="card" style="text-align:center;border-color:var(--accent)">
       <h2 style="color:var(--accent);letter-spacing:2px;margin-bottom:6px">SÉC QUÀ TẶNG</h2>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">BAN TỔ CHỨC NAM SINH LỚP HỌC</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">BAN TỔ CHỨC LỚP HỌC</div>
       <div style="font-size:18px;font-weight:700;color:var(--text);margin:6px 0" id="v-name"></div>
-      <div style="font-size:32px;font-weight:800;color:var(--success);margin:8px 0;">10.000 VNĐ</div>
-      <div style="font-size:11px;color:var(--text-dim);margin-top:12px">Chụp màn hình đưa cho Ban Tổ Chức nhận tiền thưởng mặt.</div>
+      <div style="font-size:32px;font-weight:800;color:var(--success);margin:8px 0;" id="v-amount">10.000 VNĐ</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:12px">Chụp màn hình đưa cho Ban Tổ Chức nhận tiền thưởng.</div>
       <div style="font-size:11px;color:var(--accent);margin-top:6px" id="v-id"></div>
     </div>
     <button class="btn" onclick="goHome()">QUAY LẠI MENU</button>
@@ -337,7 +492,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
         </div>
       </div>
       <div class="card">
-        <label>TẠO MÃ CODE QUÀ TẶNG 5K MỚI</label>
+        <label>TẠO MÃ CODE QUÀ TẶNG +5.000 XP MỚI</label>
         <div style="display:flex;gap:8px">
           <input id="admin-new-code" type="text" placeholder="VD: VIP2026" style="margin:0;text-transform:uppercase">
           <button class="btn" style="margin:0;width:95px;min-height:42px" onclick="adminCreateCode()">TẠO MÃ</button>
@@ -349,7 +504,7 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
 
   <!-- OVERLAYS -->
   <div id="alert-box" class="alert-overlay">
-    <h2 style="color:var(--danger);margin-bottom:8px">🚨 PHÁT HIỆN GIAN LẬN</h2>
+    <h2 style="color:var(--danger);margin-bottom:8px">🚨 CẢNH BÁO BẢO MẬT</h2>
     <p id="alert-msg" style="font-size:14px;margin-bottom:10px;color:var(--text)"></p>
   </div>
 
@@ -362,7 +517,6 @@ label { font-size: 11px; color: var(--text-dim); display: block; letter-spacing:
 </div>
 
 <script>
-// Kết nối trực tiếp chuẩn xác với Firebase Database của bạn
 const firebaseConfig = {
   databaseURL: "https://studio-3689830403-7b5c9-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
@@ -372,33 +526,141 @@ if (!firebase.apps.length) {
 const db = firebase.database();
 
 let state = {
-  name: '', classId: '', points: 0,
-  isBanned: false, cheatCount: 0,
+  name: '',
+  classId: '',
+  points: 0,
+  targetXp: 10000,
+  rewardVnd: 10000,
+  isBanned: false,
+  cheatCount: 0,
   currentRoom: 0,
-  pool1: [], pool2: [],
-  idx1: 0, idx2: 0,
+  pool1: [],
+  pool2: [],
+  idx1: 0,
+  idx2: 0,
   redeemedCodes: [],
   hasFiredFireworks: false,
   pvp: null
 };
 
-// Lắng nghe realtime toàn cục để cập nhật bảng xếp hạng
+// 10k VNĐ = +10% độ khó, tăng thêm 10k thì tăng thêm +10% (tối thiểu +10%)
+function getDifficultyPercent() {
+  const pct = Math.max(10, Math.round((state.rewardVnd / 10000) * 10));
+  return pct;
+}
+
+function getDifficultyMultiplier() {
+  return 1 + getDifficultyPercent() / 100;
+}
+
+// CHỐNG CHỤP / COPY / RỜI TAB
+function triggerScreenGuardWarning(reason) {
+  if (!state.name || state.isBanned) return;
+  document.body.classList.add('privacy-blur');
+  popup('⚠️ ' + reason);
+  setTimeout(() => {
+    document.body.classList.remove('privacy-blur');
+  }, 1400);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && (state.currentRoom > 0 || state.pvp)) {
+    document.body.classList.add('privacy-blur');
+  } else {
+    setTimeout(() => document.body.classList.remove('privacy-blur'), 350);
+  }
+});
+
+window.addEventListener('blur', () => {
+  if (state.currentRoom > 0 || state.pvp) {
+    document.body.classList.add('privacy-blur');
+  }
+});
+
+window.addEventListener('focus', () => {
+  setTimeout(() => document.body.classList.remove('privacy-blur'), 300);
+});
+
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('copy', (e) => {
+  if (e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+    triggerScreenGuardWarning('Cấm sao chép nội dung đề!');
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  const key = (e.key || '').toLowerCase();
+  if (key === 'printscreen' || e.keyCode === 44) {
+    e.preventDefault();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText('SCREENSHOT_BLOCKED').catch(() => {});
+    }
+    triggerScreenGuardWarning('Phát hiện thao tác chụp màn hình!');
+    return;
+  }
+  if (
+    key === 'f12' ||
+    (e.ctrlKey && e.shiftKey && ['i', 'j', 'c', 's'].includes(key)) ||
+    (e.ctrlKey && ['u', 'c', 's', 'p'].includes(key)) ||
+    (e.metaKey && e.shiftKey && ['3', '4', '5', 's'].includes(key))
+  ) {
+    if (!(e.ctrlKey && key === 'c' && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT'))) {
+      e.preventDefault();
+      triggerScreenGuardWarning('Thao tác bị hạn chế bởi hệ thống!');
+    }
+  }
+});
+
+// ĐỒNG BỘ CẤU HÌNH THƯỞNG TOÀN CỤC
+db.ref('config/reward').on('value', (snap) => {
+  const cfg = snap.val();
+  if (cfg) {
+    state.targetXp = Number(cfg.targetXp) > 0 ? Number(cfg.targetXp) : 10000;
+    state.rewardVnd = Number(cfg.rewardVnd) > 0 ? Number(cfg.rewardVnd) : 10000;
+    document.getElementById('cfg-target-xp').value = state.targetXp;
+    document.getElementById('cfg-reward-vnd').value = state.rewardVnd;
+    updateHomeUI();
+  }
+});
+
+function saveRewardConfig() {
+  const xpVal = parseInt(document.getElementById('cfg-target-xp').value, 10);
+  const vndVal = parseInt(document.getElementById('cfg-reward-vnd').value, 10);
+  if (!xpVal || xpVal < 500 || !vndVal || vndVal < 1000) {
+    return alert('Mốc XP tối thiểu 500 và tiền thưởng tối thiểu 1.000 VNĐ!');
+  }
+  state.targetXp = xpVal;
+  state.rewardVnd = vndVal;
+  state.hasFiredFireworks = false;
+  db.ref('config/reward').set({ targetXp: xpVal, rewardVnd: vndVal });
+  syncUserData();
+  updateHomeUI();
+  popup(`ĐÃ LƯU • ĐỘ KHÓ +${getDifficultyPercent()}%`);
+}
+
+// LẮNG NGHE USERS REALTIME
 db.ref('users').on('value', (snapshot) => {
   const users = snapshot.val() || {};
   renderLeaderboard(users);
   renderAdminTable(users);
-  
-  if(state.name) {
-    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
-    if(users[safeKey]) {
-      let u = users[safeKey];
+
+  if (state.name) {
+    const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    if (users[safeKey]) {
+      const u = users[safeKey];
       state.points = u.points || 0;
       state.isBanned = u.isBanned || false;
       state.cheatCount = u.cheatCount || 0;
       state.redeemedCodes = u.redeemedCodes || [];
       state.hasFiredFireworks = u.hasFiredFireworks || false;
-      
-      if(state.isBanned) {
+
+      if (state.isBanned) {
         document.getElementById('banned-box').classList.add('show');
       }
       updateHomeUI();
@@ -407,7 +669,7 @@ db.ref('users').on('value', (snapshot) => {
 });
 
 function syncUserData() {
-  if(!state.name) return;
+  if (!state.name) return;
   const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
   db.ref('users/' + safeKey).set({
     name: state.name,
@@ -420,35 +682,109 @@ function syncUserData() {
   });
 }
 
-// BỘ SINH CÂU HỎI
-function generate50HackerQuestions(seed) {
-  const generators = [
-    (i) => {
-      let a = (i * 3 + seed) % 15 + 4;
-      let b = (i * 7 + seed) % 9 + 2;
-      let res = a * b + a;
-      return { q: `[C++ Logic #${i}]\nint a = ${a}, b = ${b};\nint x = a * b + _____;\ncout << x; // In ra ${res}`, ans: [String(a), 'a'], explain: ['cong', 'bien a', String(a)], pts: 450 };
-    },
-    (i) => {
-      let limit = 5 + ((i + seed) % 12);
-      return { q: `[Vòng lặp bẫy #${i}]\nint dem = 0;\nfor(int i = 1; i <= ${limit}; i++) {\n  if(i % 2 == 0) _____;\n}\n// Đếm số chẵn từ 1 đến ${limit}`, ans: ['dem++', 'dem += 1', '++dem'], explain: ['tang', 'bien dem', 'chia het'], pts: 500 };
-    }
-  ];
-  let list = [];
-  for(let i = 1; i <= 50; i++) list.push(generators[i % generators.length](i));
-  return list.sort(() => Math.random() - 0.5);
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
-function generate50RiddleQuestions(seed) {
-  const staticHard = [
-    { q: "Người đàn ông đẩy xe tới khách sạn và biết mình phá sản?", ans: ["co ty phu", "choi co"], explain: ["ban co", "tro choi"], pts: 550 },
-    { q: "Có 3 bóng đèn kín và 3 công tắc ngoài cửa. Vào phòng 1 lần duy nhất để biết đèn nào?", ans: ["bat 1 cai lau", "so bong nong"], explain: ["nong", "am", "sang"], pts: 650 }
-  ];
-  let list = [...staticHard];
-  while(list.length < 50) {
-    list.push({ q: `[Bẫy Toán Học #${list.length}] Tuổi cha gấp 4 lần tuổi con. 20 năm sau cha gấp đôi. Tổng tuổi hai cha con hiện nay?`, ans: ["50"], explain: ["phuong trinh", "tuoi cha", "tuoi con"], pts: 550 });
+// BỘ 50 CÂU HỎI PHÒNG 1 (TĂNG THEO % TIỀN THƯỞNG)
+function generate50HackerQuestions(seed) {
+  const pct = getDifficultyPercent();
+  const mult = getDifficultyMultiplier();
+  const s = (seed % 90) + 10;
+  const pts = Math.round(450 * mult);
+  const items = [];
+
+  for (let i = 1; i <= 50; i++) {
+    const scale = Math.max(1, Math.round(mult * 10));
+    if (i % 4 === 1) {
+      const a = (((i * 2 + s) % 8) + 2) * scale;
+      const b = (((i * 3 + s) % 6) + 2) * scale;
+      const c = (((i + s) % 5) + 1) * scale;
+      const expr = pct >= 30 ? `(a + b) * 2 - ${c}` : `a * 2 + ${b}`;
+      const ansVal = pct >= 30 ? (a + b) * 2 - c : a * 2 + b;
+      items.push({
+        id: `H-${i}`,
+        pct,
+        q: `[+${pct}% | C++ #${i}] Cho a = ${a}, b = ${b}.\nTính giá trị biểu thức: ${expr}`,
+        ans: [String(ansVal)],
+        pts
+      });
+    } else if (i % 4 === 2) {
+      const n = Math.min(25, (((i + s) % 6) + 4) + Math.floor(pct / 15));
+      const sum = (n * (n + 1)) / 2;
+      items.push({
+        id: `H-${i}`,
+        pct,
+        q: `[+${pct}% | Vòng lặp #${i}] Tính tổng các số nguyên từ 1 đến ${n}.`,
+        ans: [String(sum)],
+        pts
+      });
+    } else if (i % 4 === 3) {
+      const dec = (((i * 4 + s) % 20) + 8) * Math.max(1, Math.floor(mult));
+      items.push({
+        id: `H-${i}`,
+        pct,
+        q: `[+${pct}% | Nhị phân #${i}] Đổi số thập phân ${dec} sang hệ nhị phân (binary).`,
+        ans: [dec.toString(2)],
+        pts
+      });
+    } else {
+      const len = 6 + (i % 6) + Math.floor(pct / 20);
+      const pos = (i % len) + 1;
+      items.push({
+        id: `H-${i}`,
+        pct,
+        q: `[+${pct}% | Mảng #${i}] Mảng ${len} phần tử đánh số từ 0.\nChỉ số (index) của phần tử thứ ${pos} là bao nhiêu?`,
+        ans: [String(pos - 1)],
+        pts
+      });
+    }
   }
-  return list.sort(() => Math.random() - 0.5);
+  return shuffleArray(items);
+}
+
+// BỘ 50 CÂU HỎI PHÒNG 2 (TĂNG THEO % TIỀN THƯỞNG)
+function generate50RiddleQuestions(seed) {
+  const pct = getDifficultyPercent();
+  const mult = getDifficultyMultiplier();
+  const s = (seed % 60) + 1;
+  const pts = Math.round(500 * mult);
+  const items = [];
+
+  const riddles = [
+    { q: "Người đàn ông đẩy xe nhỏ tới khách sạn và biết mình phá sản. Anh ta đang chơi trò gì?", ans: ["co ty phu", "choi co ty phu"] },
+    { q: "Có 3 bóng đèn trong phòng kín và 3 công tắc ở ngoài. Vào phòng 1 lần duy nhất để biết đèn nào dùng công tắc nào bằng cách nào?", ans: ["bat 1 cai lau roi tat", "so do am bong den", "kiem tra do nong"] },
+    { q: "Chọn phòng an toàn nhất: 1 - Phòng lửa cháy lớn, 2 - Phòng sát thủ cầm súng, 3 - Phòng sư tử bị bỏ đói 3 năm.", ans: ["phong 3", "3", "so 3"] },
+    { q: "Bác sĩ cho 3 viên thuốc, uống mỗi viên cách nhau 30 phút. Hỏi uống hết cả 3 viên mất bao lâu?", ans: ["60 phut", "1 gio", "60"] },
+    { q: "Một người chạy đua vượt qua người đang đứng thứ 2. Người đó đang ở vị trí thứ mấy?", ans: ["thu 2", "2", "so 2"] },
+    { q: "Cái gì thuộc về bạn nhưng người khác lại dùng nhiều hơn bạn?", ans: ["ten", "ten cua ban"] },
+    { q: "Tháng nào trong năm có 28 ngày?", ans: ["tat ca cac thang", "moi thang", "thang nao cung co"] }
+  ];
+
+  for (let i = 1; i <= 50; i++) {
+    if (i <= riddles.length && pct <= 20) {
+      const r = riddles[i - 1];
+      items.push({ id: `R-${i}`, pct, q: `[+${pct}% | Câu #${i}] ${r.q}`, ans: r.ans, pts });
+    } else {
+      const step = Math.max(1, Math.floor(pct / 10));
+      const child = (((i + s) % 6) + 3) * step;
+      const multAge = ((i + s) % 3) + 2;
+      const total = child * (multAge + 1);
+      items.push({
+        id: `R-${i}`,
+        pct,
+        q: `[+${pct}% | Logic #${i}] Tuổi bố gấp ${multAge} lần tuổi con. Tổng tuổi bố và con hiện nay là ${total}. Hỏi tuổi bố là bao nhiêu?`,
+        ans: [String(child * multAge)],
+        pts
+      });
+    }
+  }
+  return shuffleArray(items);
 }
 
 class FireworkSystem {
@@ -463,41 +799,61 @@ class FireworkSystem {
     this.canvas.height = window.innerHeight;
     this.canvas.classList.add('show');
     let count = 0;
-    const interval = setInterval(() => { this.spawn(); count++; if(count > 12) clearInterval(interval); }, 300);
-    if(!this.animId) this.loop();
+    const interval = setInterval(() => { this.spawn(); count++; if (count > 12) clearInterval(interval); }, 300);
+    if (!this.animId) this.loop();
     setTimeout(() => this.stop(), 5000);
   }
   spawn() {
     const x = Math.random() * this.canvas.width;
     const y = Math.random() * (this.canvas.height * 0.5);
     const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    for(let i=0; i<50; i++) {
-      let angle = Math.random() * Math.PI * 2, speed = Math.random() * 6 + 2;
-      this.particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, alpha: 1, decay: Math.random() * 0.015 + 0.01, color });
+    for (let i = 0; i < 50; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 6 + 2;
+      this.particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1, decay: Math.random() * 0.015 + 0.01, color });
     }
   }
   loop() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.particles.forEach((p, index) => {
       p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= p.decay;
-      this.ctx.save(); this.ctx.globalAlpha = Math.max(0, p.alpha); this.ctx.fillStyle = p.color;
-      this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 3, 0, Math.PI*2); this.ctx.fill(); this.ctx.restore();
-      if(p.alpha <= 0) this.particles.splice(index, 1);
+      this.ctx.save();
+      this.ctx.globalAlpha = Math.max(0, p.alpha);
+      this.ctx.fillStyle = p.color;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.restore();
+      if (p.alpha <= 0) this.particles.splice(index, 1);
     });
-    if(this.particles.length > 0) this.animId = requestAnimationFrame(() => this.loop());
+    if (this.particles.length > 0) this.animId = requestAnimationFrame(() => this.loop());
     else { this.animId = null; this.canvas.classList.remove('show'); }
   }
-  stop() { this.particles = []; this.canvas.classList.remove('show'); if(this.animId) cancelAnimationFrame(this.animId); this.animId = null; }
+  stop() {
+    this.particles = [];
+    this.canvas.classList.remove('show');
+    if (this.animId) cancelAnimationFrame(this.animId);
+    this.animId = null;
+  }
 }
 const fw = new FireworkSystem();
 
 function normalizeStr(s) {
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').trim();
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function initWatermark(name, cls) {
   let html = '';
-  for(let i=0; i<16; i++) html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}]</span>`;
+  for (let i = 0; i < 24; i++) {
+    html += `<span>${name || 'OVERLORD'} [${cls || 'VN'}]</span>`;
+  }
   document.getElementById('watermark-layer').innerHTML = html;
 }
 
@@ -516,24 +872,34 @@ function popup(txt) {
 function loginAction() {
   let name = document.getElementById('in-name').value.trim();
   let cls = document.getElementById('in-class').value.trim();
-  if(!name || !cls) return alert('Vui lòng nhập đầy đủ họ tên và lớp!');
-  
-  if(name.toUpperCase() === 'ADMIN' || name.toUpperCase() === 'T.N.TUAN ANH') {
-    name = 'ADMIN'; cls = 'OVERLORD';
+  if (!name || !cls) return alert('Vui lòng nhập đầy đủ họ tên và lớp!');
+
+  if (name.toUpperCase() === 'ADMIN' || name.toUpperCase() === 'T.N.TUAN ANH') {
+    name = 'ADMIN';
+    cls = 'OVERLORD';
   }
 
   state.name = name;
   state.classId = cls;
 
-  let seed = Math.floor(Math.random() * 9999);
+  const seed = Math.floor(Math.random() * 9999);
   state.pool1 = generate50HackerQuestions(seed);
   state.pool2 = generate50RiddleQuestions(seed);
-  state.idx1 = 0; state.idx2 = 0;
+  state.idx1 = 0;
+  state.idx2 = 0;
 
   const safeKey = name.replace(/[.#$\/\[\]]/g, '_');
   db.ref('users/' + safeKey).once('value').then((snap) => {
-    if(!snap.exists()) {
-      db.ref('users/' + safeKey).set({ name, classId: cls, points: 0, isBanned: false, cheatCount: 0, redeemedCodes: [], hasFiredFireworks: false });
+    if (!snap.exists()) {
+      db.ref('users/' + safeKey).set({
+        name,
+        classId: cls,
+        points: 0,
+        isBanned: false,
+        cheatCount: 0,
+        redeemedCodes: [],
+        hasFiredFireworks: false
+      });
     }
   });
 
@@ -543,45 +909,54 @@ function loginAction() {
 }
 
 function logoutAction() {
-  state.name = ''; state.currentRoom = 0;
+  state.name = '';
+  state.currentRoom = 0;
   showScreen('screen-login');
 }
 
 function updateHomeUI() {
-  if(!state.name) return;
+  if (!state.name) return;
+  const pct = getDifficultyPercent();
+  const reached = state.points >= state.targetXp;
+
   document.getElementById('lbl-username').textContent = state.name + ' // ' + state.classId;
   document.getElementById('lbl-points').textContent = state.points.toLocaleString() + ' XP';
   document.getElementById('quiz-points').textContent = state.points.toLocaleString() + ' XP';
-  document.getElementById('progress-bar').style.width = Math.min(100, (state.points / 10000) * 100) + '%';
-  
-  if(state.points >= 10000 && !state.hasFiredFireworks) {
+  document.getElementById('progress-bar').style.width = Math.min(100, (state.points / state.targetXp) * 100) + '%';
+  document.getElementById('lbl-goal-text').textContent =
+    `Mốc: ${state.targetXp.toLocaleString()} XP • Thưởng: ${state.rewardVnd.toLocaleString()} VNĐ`;
+  document.getElementById('lbl-diff-pct').textContent = `ĐỘ KHÓ: +${pct}%`;
+
+  if (reached && !state.hasFiredFireworks) {
     state.hasFiredFireworks = true;
     syncUserData();
     fw.start();
   }
-  document.getElementById('btn-voucher').style.display = (state.points >= 10000) ? 'block' : 'none';
-  
-  if(state.name.toUpperCase() === 'ADMIN') {
-    document.getElementById('btn-admin').style.display = 'block';
-  } else {
-    document.getElementById('btn-admin').style.display = 'none';
-  }
+  const btnVoucher = document.getElementById('btn-voucher');
+  btnVoucher.style.display = reached ? 'block' : 'none';
+  btnVoucher.textContent = `🎉 XUẤT PHIẾU NHẬN ${state.rewardVnd.toLocaleString()} VNĐ`;
+
+  document.getElementById('btn-admin').style.display = (state.name.toUpperCase() === 'ADMIN') ? 'block' : 'none';
 }
 
 function renderLeaderboard(users) {
-  let userArr = Object.values(users).map(u => ({ name: u.name, points: u.points || 0, banned: u.isBanned }));
+  const userArr = Object.values(users).map(u => ({
+    name: u.name,
+    points: u.points || 0,
+    banned: u.isBanned
+  }));
   userArr.sort((a, b) => b.points - a.points);
 
-  let lbox = document.getElementById('leaderboard-list');
-  if(!lbox) return;
+  const lbox = document.getElementById('leaderboard-list');
+  if (!lbox) return;
   lbox.innerHTML = '';
-  if(userArr.length === 0) {
+  if (userArr.length === 0) {
     lbox.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-dim)">Chưa có dữ liệu</td></tr>`;
     return;
   }
   userArr.forEach((u, idx) => {
-    let tr = document.createElement('tr');
-    let rankColor = idx === 0 ? 'color:var(--accent);font-weight:bold' : (idx === 1 ? 'color:var(--success)' : '');
+    const tr = document.createElement('tr');
+    const rankColor = idx === 0 ? 'color:var(--accent);font-weight:bold' : (idx === 1 ? 'color:var(--success)' : '');
     tr.innerHTML = `
       <td style="width:36px;text-align:center;${rankColor}">#${idx + 1}</td>
       <td>${u.name} ${u.banned ? '<span style="color:var(--danger)">[BANNED]</span>' : ''}</td>
@@ -592,12 +967,12 @@ function renderLeaderboard(users) {
 }
 
 function renderAdminTable(users) {
-  let tbody = document.getElementById('admin-user-list');
-  if(!tbody) return;
+  const tbody = document.getElementById('admin-user-list');
+  if (!tbody) return;
   tbody.innerHTML = '';
-  for(let key in users) {
-    let u = users[key];
-    let tr = document.createElement('tr');
+  for (const key in users) {
+    const u = users[key];
+    const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><b>${u.name}</b></td>
       <td>${u.points || 0} XP (${u.cheatCount || 0} lỗi)</td>
@@ -613,12 +988,12 @@ function renderAdminTable(users) {
 
 function redeemCode() {
   const code = document.getElementById('in-code').value.trim().toUpperCase();
-  if(!code) return alert('Vui lòng nhập mã code!');
-  
+  if (!code) return alert('Vui lòng nhập mã code!');
+
   db.ref('codes/' + code).once('value').then((snap) => {
-    if(!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã code không tồn tại!');
-    if(state.redeemedCodes.includes(code)) return alert('Bạn đã nhập mã này rồi!');
-    
+    if (!snap.exists() && code !== 'NAMGIOS5K' && code !== '1911VIP') return alert('Mã code không tồn tại!');
+    if (state.redeemedCodes.includes(code)) return alert('Bạn đã nhập mã này rồi!');
+
     state.redeemedCodes.push(code);
     state.points += 5000;
     syncUserData();
@@ -628,9 +1003,17 @@ function redeemCode() {
 }
 
 function openRoom(roomId) {
-  if(state.isBanned) return;
+  if (state.isBanned) return;
   state.currentRoom = roomId;
-  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'ĐỐ MẸO X10';
+  const seed = Date.now() + Math.floor(Math.random() * 1000);
+  if (roomId === 1) {
+    state.pool1 = generate50HackerQuestions(seed);
+    state.idx1 = 0;
+  } else {
+    state.pool2 = generate50RiddleQuestions(seed);
+    state.idx2 = 0;
+  }
+  document.getElementById('quiz-title').textContent = roomId === 1 ? 'HACKER TERMINAL' : 'ĐỐ MẸO & TƯ DUY';
   renderCurrentQuestion();
   showScreen('screen-quiz');
 }
@@ -640,64 +1023,77 @@ function renderCurrentQuestion() {
   const pool = isR1 ? state.pool1 : state.pool2;
   let idx = isR1 ? state.idx1 : state.idx2;
 
-  if(idx >= pool.length) {
-    let seed = Math.floor(Math.random() * 9999);
-    if(isR1) { state.pool1 = generate50HackerQuestions(seed); state.idx1 = 0; idx = 0; }
-    else { state.pool2 = generate50RiddleQuestions(seed); state.idx2 = 0; idx = 0; }
+  if (idx >= pool.length) {
+    const seed = Date.now() + Math.floor(Math.random() * 1000);
+    if (isR1) {
+      state.pool1 = generate50HackerQuestions(seed);
+      state.idx1 = 0;
+      idx = 0;
+    } else {
+      state.pool2 = generate50RiddleQuestions(seed);
+      state.idx2 = 0;
+      idx = 0;
+    }
   }
 
-  const qObj = isR1 ? state.pool1[idx] : state.pool2[idx];
+  const qObj = (isR1 ? state.pool1 : state.pool2)[idx];
   document.getElementById('q-progress').textContent = `CÂU ${idx + 1}/50`;
+  document.getElementById('q-diff').textContent = `ĐỘ KHÓ: +${qObj.pct}%`;
   document.getElementById('q-reward').textContent = `THƯỞNG: +${qObj.pts} XP`;
   document.getElementById('quiz-question').textContent = qObj.q;
   document.getElementById('quiz-ans').value = '';
-  document.getElementById('quiz-exp').value = '';
 }
 
 function advanceQuestion() {
-  if(state.currentRoom === 1) state.idx1++;
+  if (state.currentRoom === 1) state.idx1++;
   else state.idx2++;
   renderCurrentQuestion();
 }
 
-function evaluateAnswer(ansRaw, expRaw, qObj) {
+function evaluateAnswerOnly(ansRaw, qObj) {
   const a = normalizeStr(ansRaw);
-  const e = normalizeStr(expRaw);
-  if(a.length < 1 || e.length < 10) return { ok: false, reason: 'Giải thích quá ngắn (tối thiểu 10 ký tự)!' };
-  if(/(.)\1{4,}/.test(e)) return { ok: false, reason: 'Phát hiện spam ký tự vô nghĩa!' };
+  if (!a) return { ok: false, reason: 'Chưa nhập đáp án!' };
 
-  let matchAns = qObj.ans.some(k => a.includes(normalizeStr(k)));
-  let matchExp = qObj.explain.some(k => e.includes(normalizeStr(k)));
-  if(!matchAns) return { ok: false, reason: 'Đáp án chưa chính xác!' };
-  if(!matchExp) return { ok: false, reason: 'Đáp án đúng nhưng giải thích chưa hợp lý!' };
+  const matchAns = qObj.ans.some(k => {
+    const nk = normalizeStr(k);
+    return a === nk || (nk.length >= 4 && a.includes(nk));
+  });
+
+  if (!matchAns) return { ok: false, reason: 'Đáp án chưa chính xác!' };
   return { ok: true, pts: qObj.pts };
 }
 
 function submitQuiz() {
   const ans = document.getElementById('quiz-ans').value;
-  const exp = document.getElementById('quiz-exp').value;
-  if(!ans.trim() || !exp.trim()) return alert('Bắt buộc nhập cả Đáp án và Giải thích!');
+  if (!ans.trim()) return alert('Vui lòng nhập đáp án!');
 
   const isR1 = state.currentRoom === 1;
   const qObj = isR1 ? state.pool1[state.idx1] : state.pool2[state.idx2];
-  const res = evaluateAnswer(ans, exp, qObj);
+  const res = evaluateAnswerOnly(ans, qObj);
 
-  if(res.ok) {
+  if (res.ok) {
     state.points += res.pts;
     popup(`CHUẨN XÁC! +${res.pts} XP`);
+    syncUserData();
+    setTimeout(advanceQuestion, 750);
   } else {
     state.points = Math.max(0, state.points - 300);
-    popup(`SAI (-300 XP): ${res.reason}`);
+    popup(`SAI ĐÁP ÁN (-300 XP)`);
+    syncUserData();
   }
-  syncUserData();
-  setTimeout(advanceQuestion, 900);
 }
 
 function exitRoomWithPenalty() {
-  if(confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
-    let seed = Math.floor(Math.random() * 99999);
-    if(state.currentRoom === 1) { state.pool1 = generate50HackerQuestions(seed); state.idx1 = 0; }
-    if(state.currentRoom === 2) { state.pool2 = generate50RiddleQuestions(seed); state.idx2 = 0; }
+  if (confirm('Thoát phòng sẽ HỦY 50 CÂU CŨ và tạo mới 50 câu khác. Tiếp tục?')) {
+    const seed = Date.now() + Math.floor(Math.random() * 99999);
+    if (state.currentRoom === 1) {
+      state.pool1 = generate50HackerQuestions(seed);
+      state.idx1 = 0;
+    }
+    if (state.currentRoom === 2) {
+      state.pool2 = generate50RiddleQuestions(seed);
+      state.idx2 = 0;
+    }
     state.currentRoom = 0;
     showScreen('screen-home');
   }
@@ -706,23 +1102,24 @@ function exitRoomWithPenalty() {
 // PVP 1V1
 function createPvpRoom() {
   const bet = +document.getElementById('pvp-bet').value;
-  if(state.points < bet) return alert('Số điểm không đủ để cược!');
-  
-  const code = Math.random().toString(36).substring(2,8).toUpperCase();
-  const qRand = state.pool2[Math.floor(Math.random() * state.pool2.length)];
+  if (state.points < bet) return alert('Số điểm không đủ để cược!');
+
+  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const pool = state.pool2.length ? state.pool2 : generate50RiddleQuestions(Date.now());
+  const qRand = pool[Math.floor(Math.random() * pool.length)];
   const roomData = { code, host: state.name, bet, status: 'waiting', question: qRand, answers: {} };
 
   db.ref('pvp_rooms/' + code).set(roomData);
   state.points -= bet;
   syncUserData();
 
-  state.pvp = { code, bet, isHost: true };
+  state.pvp = { code, bet, isHost: true, question: qRand };
   document.getElementById('pvp-display-code').textContent = code;
   showScreen('screen-pvp-wait');
 
   db.ref('pvp_rooms/' + code).on('value', (snap) => {
-    let r = snap.val();
-    if(r && r.status === 'playing') {
+    const r = snap.val();
+    if (r && r.status === 'playing') {
       db.ref('pvp_rooms/' + code).off();
       startPvpBattle(r);
     }
@@ -731,28 +1128,28 @@ function createPvpRoom() {
 
 function joinPvpRoom() {
   const code = document.getElementById('pvp-join-code').value.trim().toUpperCase();
-  if(!code) return alert('Vui lòng nhập mã phòng!');
+  if (!code) return alert('Vui lòng nhập mã phòng!');
 
   db.ref('pvp_rooms/' + code).once('value').then((snap) => {
-    let room = snap.val();
-    if(!room) return alert('Không tìm thấy mã phòng trực tuyến này!');
-    if(room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc!');
-    if(room.host === state.name) return alert('Không thể tự vào phòng của mình!');
-    if(state.points < room.bet) return alert('Bạn không đủ điểm cược!');
+    const room = snap.val();
+    if (!room) return alert('Không tìm thấy mã phòng trực tuyến này!');
+    if (room.status !== 'waiting') return alert('Phòng đã bắt đầu hoặc kết thúc!');
+    if (room.host === state.name) return alert('Không thể tự vào phòng của mình!');
+    if (state.points < room.bet) return alert('Bạn không đủ điểm cược!');
 
     state.points -= room.bet;
     syncUserData();
 
     db.ref('pvp_rooms/' + code).update({ guest: state.name, status: 'playing' });
-    state.pvp = { code, bet: room.bet, isHost: false };
+    state.pvp = { code, bet: room.bet, isHost: false, question: room.question };
     startPvpBattle(room);
   });
 }
 
 function startPvpBattle(room) {
+  state.pvp.question = room.question;
   document.getElementById('pvp-q-box').textContent = room.question.q;
   document.getElementById('pvp-ans').value = '';
-  document.getElementById('pvp-exp').value = '';
   document.getElementById('pvp-play-badge').textContent = 'CƯỢC: ' + room.bet.toLocaleString() + ' XP';
   showScreen('screen-pvp-play');
 
@@ -761,31 +1158,34 @@ function startPvpBattle(room) {
   state.pvp.timer = setInterval(() => {
     left--;
     document.getElementById('pvp-timer').textContent = left;
-    if(left <= 0) { clearInterval(state.pvp.timer); submitPvpAnswer(); }
+    if (left <= 0) {
+      clearInterval(state.pvp.timer);
+      submitPvpAnswer();
+    }
   }, 1000);
 }
 
 function submitPvpAnswer() {
-  if(state.pvp.submitted) return;
+  if (!state.pvp || state.pvp.submitted) return;
   state.pvp.submitted = true;
   clearInterval(state.pvp.timer);
 
   const ans = document.getElementById('pvp-ans').value;
-  const exp = document.getElementById('pvp-exp').value;
 
   db.ref('pvp_rooms/' + state.pvp.code).once('value').then((snap) => {
-    let room = snap.val();
-    if(!room) return;
-    let res = evaluateAnswer(ans, exp, room.question);
-    let sc = res.ok ? res.pts : 0;
+    const room = snap.val();
+    if (!room) return;
+    const qObj = room.question || state.pvp.question;
+    const res = evaluateAnswerOnly(ans, qObj);
+    const sc = res.ok ? res.pts : 0;
 
-    let safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
+    const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
     db.ref(`pvp_rooms/${state.pvp.code}/answers/${safeKey}`).set(sc);
     popup('Đang chờ đối thủ nộp bài...');
 
     db.ref('pvp_rooms/' + state.pvp.code).on('value', (s) => {
-      let r = s.val();
-      if(r && r.answers && Object.keys(r.answers).length >= 2) {
+      const r = s.val();
+      if (r && r.answers && Object.keys(r.answers).length >= 2) {
         db.ref('pvp_rooms/' + state.pvp.code).off();
         finishPvpBattle(r);
       }
@@ -796,24 +1196,25 @@ function submitPvpAnswer() {
 function finishPvpBattle(room) {
   const names = Object.keys(room.answers || {});
   let winnerKey = null;
-  if(names.length === 2) {
-    let s0 = room.answers[names[0]], s1 = room.answers[names[1]];
-    if(s0 > s1) winnerKey = names[0];
-    else if(s1 > s0) winnerKey = names[1];
+  if (names.length === 2) {
+    const s0 = room.answers[names[0]];
+    const s1 = room.answers[names[1]];
+    if (s0 > s1) winnerKey = names[0];
+    else if (s1 > s0) winnerKey = names[1];
   }
 
   const safeKey = state.name.replace(/[.#$\/\[\]]/g, '_');
   const pot = room.bet * 2;
-  if(winnerKey === safeKey) {
+  if (winnerKey === safeKey) {
     state.points += pot;
     alert('CHIẾN THẮNG! Nhận ' + pot.toLocaleString() + ' XP.');
-  } else if(!winnerKey) {
+  } else if (!winnerKey) {
     state.points += room.bet;
     alert('HÒA KÈO! Hoàn điểm cược.');
   } else {
     alert('THUA TRẬN! Mất ' + room.bet.toLocaleString() + ' XP.');
   }
-  
+
   syncUserData();
   db.ref('pvp_rooms/' + state.pvp.code).remove();
   state.pvp = null;
@@ -821,8 +1222,8 @@ function finishPvpBattle(room) {
 }
 
 function cancelPvpRoom() {
-  if(state.pvp) {
-    if(state.pvp.isHost) {
+  if (state.pvp) {
+    if (state.pvp.isHost) {
       state.points += state.pvp.bet;
       syncUserData();
       db.ref('pvp_rooms/' + state.pvp.code).remove();
@@ -836,20 +1237,21 @@ function goHome() { showScreen('screen-home'); }
 
 function openVoucher() {
   document.getElementById('v-name').textContent = state.name.toUpperCase() + ' (' + state.classId + ')';
-  document.getElementById('v-id').textContent = 'MÃ XÁC THỰC: ' + Math.random().toString(36).substring(2,8).toUpperCase();
+  document.getElementById('v-amount').textContent = state.rewardVnd.toLocaleString() + ' VNĐ';
+  document.getElementById('v-id').textContent = 'MỐC ĐẠT: ' + state.targetXp.toLocaleString() + ' XP • MÃ: ' + Math.random().toString(36).substring(2, 8).toUpperCase();
   showScreen('screen-voucher');
 }
 
 function openAdmin() {
-  if(state.name.toUpperCase() !== 'ADMIN') return;
+  if (state.name.toUpperCase() !== 'ADMIN') return;
   showScreen('screen-admin');
 }
 
 function adminToggleBan(key) {
   db.ref('users/' + key).once('value').then(s => {
-    let u = s.val();
-    if(u) {
-      let newBanned = !u.isBanned;
+    const u = s.val();
+    if (u) {
+      const newBanned = !u.isBanned;
       db.ref('users/' + key).update({ isBanned: newBanned, cheatCount: newBanned ? u.cheatCount : 0 });
       popup('Đã cập nhật trạng thái thành công');
     }
@@ -857,8 +1259,8 @@ function adminToggleBan(key) {
 }
 
 function adminCreateCode() {
-  let newCode = document.getElementById('admin-new-code').value.trim().toUpperCase();
-  if(!newCode) return;
+  const newCode = document.getElementById('admin-new-code').value.trim().toUpperCase();
+  if (!newCode) return;
   db.ref('codes/' + newCode).set(true);
   document.getElementById('admin-new-code').value = '';
   popup('TẠO MÃ THÀNH CÔNG: ' + newCode);
